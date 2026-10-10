@@ -1,0 +1,68 @@
+{
+  "intent_id": "checkout",
+  "version": 1,
+  "created_by": "human",
+  "parent_version": null,
+  "intent_hash": "db69d87f31507d48da0153d308424a2e3c2935e00d2e8830f06c5ee0e475aed8",
+  "steps": [
+    {
+      "action": "goto_start"
+    },
+    {
+      "action": "fill_field",
+      "target": {
+        "by": "label",
+        "name": "Name"
+      },
+      "field_key": "full_name"
+    },
+    {
+      "action": "fill_field",
+      "target": {
+        "by": "label",
+        "name": "Email"
+      },
+      "field_key": "email"
+    },
+    {
+      "action": "fill_field",
+      "target": {
+        "by": "label",
+        "name": "Address"
+      },
+      "field_key": "street_address"
+    },
+    {
+      "action": "fill_field",
+      "target": {
+        "by": "label",
+        "name": "Card number"
+      },
+      "field_key": "card_number"
+    },
+    {
+      "action": "fill_field",
+      "target": {
+        "by": "label",
+        "name": "Expiry"
+      },
+      "field_key": "expiry"
+    },
+    {
+      "action": "fill_field",
+      "target": {
+        "by": "label",
+        "name": "CVC"
+      },
+      "field_key": "cvc"
+    },
+    {
+      "action": "click_button",
+      "target": {
+        "by": "role",
+        "name": "Checkout",
+        "role": "button"
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "checkout",
+  "title": "Complete Checkout",
+  "goal": "Complete checkout with a valid credit card",
+  "test_data": {
+    "full_name": "Jane Doe",
+    "email": "jane@example.com",
+    "street_address": "123 Main St",
+    "card_number": "4242424242424242",
+    "expiry": "12/30",
+    "cvc": "123"
+  },
+  "expected_outcome": {
+    "confirmation_phrase": "Order confirmed",
+    "order_id_pattern": "QA-[0-9]+",
+    "expected_total": 36.50
+  }
+}
