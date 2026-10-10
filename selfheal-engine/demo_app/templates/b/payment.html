@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Payment - Version {{ version|upper }}{% endblock %}
+
+{% block content %}
+<nav class="stepper" aria-label="Checkout Progress">
+  <button type="button" class="step-indicator">1. Cart</button>
+  <button type="button" class="step-indicator">2. Shipping</button>
+  <button type="button" class="step-indicator active">3. Payment</button>
+  <button type="button" class="step-indicator">4. Review</button>
+</nav>
+
+<div class="card">
+  <h1 class="card-title">Payment Method</h1>
+
+  <form action="/v/{{ version }}/payment" method="post">
+    <div class="form-group">
+      <label for="b-payment-card">Credit card #</label>
+      <input type="text" id="b-payment-card" name="card_number" value="{{ session_data.get('card_number', '') }}" required>
+    </div>
+
+    <div class="form-group">
+      <label for="b-payment-expiry">Valid thru (MM/YY)</label>
+      <input type="text" id="b-payment-expiry" name="expiry" placeholder="MM/YY" value="{{ session_data.get('expiry', '') }}" required>
+    </div>
+
+    <div class="form-group">
+      <label for="b-payment-cvc">Security code</label>
+      <input type="text" id="b-payment-cvc" name="cvc" value="{{ session_data.get('cvc', '') }}" required>
+    </div>
+
+    <button type="submit" class="btn">Review order</button>
+  </form>
+</div>
+{% endblock %}

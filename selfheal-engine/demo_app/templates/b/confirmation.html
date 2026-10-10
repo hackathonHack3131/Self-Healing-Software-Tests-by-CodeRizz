@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmed - Version {{ version|upper }}{% endblock %}
+
+{% block content %}
+<div class="card confirmation-card">
+  <h1 class="confirmation-title">Order confirmed</h1>
+  <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Thank you! Your order has been placed successfully.</p>
+
+  <div class="summary-box" style="text-align: left;">
+    <div class="summary-row">
+      <span>Order Number</span>
+      <strong id="b-order-id">{{ order_id }}</strong>
+    </div>
+    <div class="summary-row">
+      <span>Payment Status</span>
+      <span style="color: #34d399; font-weight: 600;">Processed</span>
+    </div>
+    <div class="summary-total-row">
+      <span>Total Charged</span>
+      <strong id="b-total-charged">${{ total }}</strong>
+    </div>
+  </div>
+
+  <p style="margin-top: 2rem;">
+    <a href="/" class="btn" style="display: inline-block; width: auto; padding: 0.75rem 2rem;">Shop More</a>
+  </p>
+</div>
+{% endblock %}

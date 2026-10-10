@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Cart - Version {{ version|upper }}{% endblock %}
+
+{% block content %}
+<nav class="stepper" aria-label="Checkout Progress">
+  <button type="button" class="step-indicator active">1. Cart</button>
+  <button type="button" class="step-indicator">2. Shipping</button>
+  <button type="button" class="step-indicator">3. Payment</button>
+  <button type="button" class="step-indicator">4. Review</button>
+</nav>
+
+<div class="card">
+  <h1 class="card-title">Shopping Cart</h1>
+
+  <table class="cart-table">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Price</th>
+        <th>Qty</th>
+        <th style="text-align: right;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in cart['items'] %}
+      <tr>
+        <td><strong>{{ item.name }}</strong></td>
+        <td>${{ "%.2f"|format(item.price) }}</td>
+        <td>{{ item.quantity }}</td>
+        <td style="text-align: right;">${{ "%.2f"|format(item.total) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="summary-box">
+    <div class="summary-row">
+      <span>Subtotal</span>
+      <span>${{ cart.subtotal }}</span>
+    </div>
+    <div class="summary-row">
+      <span>Standard Shipping</span>
+      <span>${{ cart.shipping }}</span>
+    </div>
+    <div class="summary-total-row">
+      <span>Order Total</span>
+      <span>${{ cart.total }}</span>
+    </div>
+  </div>
+
+  <form action="/v/{{ version }}/shipping" method="get">
+    <button type="submit" class="btn">Proceed to shipping</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Shipping - Version {{ version|upper }}{% endblock %}
+
+{% block content %}
+<nav class="stepper" aria-label="Checkout Progress">
+  <button type="button" class="step-indicator">1. Cart</button>
+  <button type="button" class="step-indicator active">2. Shipping</button>
+  <button type="button" class="step-indicator">3. Payment</button>
+  <button type="button" class="step-indicator">4. Review</button>
+</nav>
+
+<div class="card">
+  <h1 class="card-title">Shipping Address</h1>
+
+  <form action="/v/{{ version }}/shipping" method="post">
+    <div class="form-group">
+      <label for="b-shipping-name">Full name</label>
+      <input type="text" id="b-shipping-name" name="full_name" value="{{ session_data.get('full_name', '') }}" required>
+    </div>
+
+    <div class="form-group">
+      <label for="b-shipping-email">Email address</label>
+      <input type="email" id="b-shipping-email" name="email_address" value="{{ session_data.get('email_address', '') }}" required>
+    </div>
+
+    <div class="form-group">
+      <label for="b-shipping-address">Street address</label>
+      <input type="text" id="b-shipping-address" name="street_address" value="{{ session_data.get('street_address', '') }}" required>
+    </div>
+
+    <button type="submit" class="btn">Continue to payment</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SelfHeal Shop{% endblock %}</title>
+  <link rel="stylesheet" href="/static/{{ css_file|default('a.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a href="/" class="brand">SelfHeal Shop</a>
+    {% if version %}
+    <span class="version-badge">Version {{ version|upper }}</span>
+    {% endif %}
+  </header>
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

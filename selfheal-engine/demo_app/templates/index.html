@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}SelfHeal Shop - Versions{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h1 class="card-title">Checkout Versions</h1>
+  <p style="margin-bottom: 1.5rem; color: var(--text-muted);">
+    Select a checkout workflow version to test. Each version shares cart data ($36.50 total) but features distinct workflows and failure modes.
+  </p>
+
+  <ul class="summary-list">
+    <li class="summary-item" style="padding: 1rem 0;">
+      <div>
+        <strong><a href="/v/a/">Version A</a></strong>
+        <p style="font-size: 0.875rem; color: var(--text-muted);">Single-page checkout with order summary and form fields on one screen.</p>
+      </div>
+    </li>
+    <li class="summary-item" style="padding: 1rem 0;">
+      <div>
+        <strong><a href="/v/b/">Version B</a></strong>
+        <p style="font-size: 0.875rem; color: var(--text-muted);">Four-step redesigned checkout: Cart &rarr; Shipping &rarr; Payment &rarr; Review.</p>
+      </div>
+    </li>
+    <li class="summary-item" style="padding: 1rem 0;">
+      <div>
+        <strong><a href="/v/c/">Version C</a></strong>
+        <p style="font-size: 0.875rem; color: var(--text-muted);">Multi-step flow where placing order fails with HTTP 500 (functional failure).</p>
+      </div>
+    </li>
+    <li class="summary-item" style="padding: 1rem 0;">
+      <div>
+        <strong><a href="/v/d/">Version D</a></strong>
+        <p style="font-size: 0.875rem; color: var(--text-muted);">Multi-step flow with wrong confirmation total ($32.50 instead of $36.50).</p>
+      </div>
+    </li>
+  </ul>
+</div>
+{% endblock %}

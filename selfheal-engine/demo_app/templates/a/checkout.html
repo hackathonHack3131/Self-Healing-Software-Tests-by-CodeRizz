@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Version A{% endblock %}
+
+{% block content %}
+<div class="checkout-grid">
+  <div class="card">
+    <h2 class="card-title">Order Summary</h2>
+    <ul class="summary-list">
+      {% for item in cart['items'] %}
+      <li class="summary-item">
+        <span>{{ item.name }} &times; {{ item.quantity }}</span>
+        <span>${{ "%.2f"|format(item.total) }}</span>
+      </li>
+      {% endfor %}
+      <li class="summary-item">
+        <span>Subtotal</span>
+        <span>${{ cart.subtotal }}</span>
+      </li>
+      <li class="summary-item">
+        <span>Shipping</span>
+        <span>${{ cart.shipping }}</span>
+      </li>
+    </ul>
+    <div class="summary-total">
+      <span>Total</span>
+      <span>${{ cart.total }}</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Payment &amp; Shipping Details</h2>
+    <form action="/v/a/place" method="post">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Address</label>
+        <input type="text" id="address" name="address" required>
+      </div>
+
+      <div class="form-group">
+        <label for="card_number">Card number</label>
+        <input type="text" id="card_number" name="card_number" required>
+      </div>
+
+      <div class="form-group">
+        <label for="expiry">Expiry</label>
+        <input type="text" id="expiry" name="expiry" placeholder="MM/YY" required>
+      </div>
+
+      <div class="form-group">
+        <label for="cvc">CVC</label>
+        <input type="text" id="cvc" name="cvc" required>
+      </div>
+
+      <button type="submit" id="checkout-button" class="btn">Checkout</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

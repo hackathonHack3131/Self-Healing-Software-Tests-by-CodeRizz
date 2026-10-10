@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Review Order - Version {{ version|upper }}{% endblock %}
+
+{% block content %}
+<nav class="stepper" aria-label="Checkout Progress">
+  <button type="button" class="step-indicator">1. Cart</button>
+  <button type="button" class="step-indicator">2. Shipping</button>
+  <button type="button" class="step-indicator">3. Payment</button>
+  <button type="button" class="step-indicator active">4. Review</button>
+</nav>
+
+<div class="card">
+  <h1 class="card-title">Review &amp; Confirm</h1>
+
+  <div class="summary-box">
+    <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #f1f5f9;">Delivery Details</h3>
+    <p><strong>Recipient:</strong> {{ session_data.get('full_name', 'Jane Doe') }}</p>
+    <p><strong>Email:</strong> {{ session_data.get('email_address', 'jane@example.com') }}</p>
+    <p><strong>Address:</strong> {{ session_data.get('street_address', '123 Market St') }}</p>
+  </div>
+
+  <div class="summary-box">
+    <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #f1f5f9;">Payment Details</h3>
+    <p><strong>Card:</strong> **** **** **** {{ session_data.get('card_number', '4242')[-4:] }}</p>
+    <p><strong>Expires:</strong> {{ session_data.get('expiry', '12/28') }}</p>
+  </div>
+
+  <div class="summary-box">
+    <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #f1f5f9;">Price Summary</h3>
+    <div class="summary-row">
+      <span>Subtotal</span>
+      <span>${{ cart.subtotal }}</span>
+    </div>
+    <div class="summary-row">
+      <span>Shipping</span>
+      <span>${{ cart.shipping }}</span>
+    </div>
+    <div class="summary-total-row">
+      <span>Total to Pay</span>
+      <span>${{ cart.total }}</span>
+    </div>
+  </div>
+
+  <form action="/v/{{ version }}/place" method="post">
+    <button type="submit" class="btn">Place order securely</button>
+  </form>
+</div>
+{% endblock %}
