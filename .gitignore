@@ -1,0 +1,46 @@
+# Maven Build Output
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# BlueJ files
+*.ctxt
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+# Visual Studio Code
+.vscode/
+
+# Local databases and runtime data
+data/
+*.mv.db
+*.trace.db
+
+# Test artifacts and screenshots
+artifacts/
+
+# OS generated files
+.DS_Store
+Thumbs.db

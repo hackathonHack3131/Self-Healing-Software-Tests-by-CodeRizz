@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: aegis-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: aegis_test
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aegis-backend
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: 8000
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/aegis_test?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      BROWSER_HEADLESS: "true"
+      ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:3001"
+      DEMO_TARGET_URL: "http://backend:8000/demo/index.html"
+      ARTIFACTS_DIR: "/app/artifacts"
+    volumes:
+      - artifacts_data:/app/artifacts
+
+volumes:
+  mysql_data:
+  artifacts_data:
