@@ -189,6 +189,26 @@ class StepResult(BaseModel):
     failure_type: FailureType | None = None
 
 
+class Check(BaseModel):
+    """Individual verification check result."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str
+    passed: bool
+    detail: str
+    evidence: Any = None
+
+
+class VerificationResult(BaseModel):
+    """Aggregated deterministic verification result."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    passed: bool
+    checks: list[Check]
+
+
 class RunResult(BaseModel):
     """Comprehensive result of an end-to-end recipe run."""
 
@@ -200,3 +220,5 @@ class RunResult(BaseModel):
     failure_type: FailureType | None = None
     evidence: dict[str, Any] = Field(default_factory=dict)
     agent_explanation: str | None = None
+    verification: VerificationResult | None = None
+
