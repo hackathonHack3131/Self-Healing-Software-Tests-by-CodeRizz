@@ -51,3 +51,12 @@ async def browser_session(make_settings):
     settings, start_url = make_settings("/v/a/")
     async with BrowserSession(settings=settings, start_url=start_url) as session:
         yield session
+
+
+@pytest.fixture
+async def session_b(make_settings):
+    """Async BrowserSession fixture pointed at Version B start URL."""
+    settings, start_url = make_settings("/v/b/")
+    async with BrowserSession(settings=settings, start_url=start_url) as session:
+        yield session
+

@@ -103,7 +103,14 @@ class BrowserSession:
 
         if not self.page:
             raise RuntimeError("BrowserSession page is not open")
-        return await self.page.goto(url, **kwargs)
+        try:
+            return await self.page.goto(url, **kwargs)
+        except Exception as exc:
+            if "ERR_NO_BUFFER_SPACE" in str(exc) or "ECONNREFUSED" in str(exc):
+                await asyncio.sleep(0.2)
+                return await self.page.goto(url, **kwargs)
+            raise
+
 
     async def goto_start(self, **kwargs: Any) -> Response | None:
         """Navigate to the configured start URL."""

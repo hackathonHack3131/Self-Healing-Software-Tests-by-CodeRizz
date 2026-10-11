@@ -454,3 +454,22 @@ class FailureContext(BaseModel):
         """Estimate token count based on JSON serialized character count."""
         return max(1, len(self.model_dump_json()) // 4)
 
+
+# -------------------------------------------------------------
+# Module 8: Healing Result Model
+# -------------------------------------------------------------
+
+class HealResult(BaseModel):
+    """Result of an automated self-healing attempt."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    status: Status
+    recipe: Recipe | None = None
+    executed_steps: list[Step] = Field(default_factory=list)
+    explanation: str = ""
+    trace: list[dict[str, Any]] = Field(default_factory=list)
+    clean_replay_result: RunResult | None = None
+    is_recorded: bool = False
+
+

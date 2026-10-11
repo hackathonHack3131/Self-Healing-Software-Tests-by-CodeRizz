@@ -1,0 +1,60 @@
+[
+  {
+    "tool": "observe"
+  },
+  {
+    "tool": "propose_click",
+    "ref": "ref_6"
+  },
+  {
+    "tool": "observe"
+  },
+  {
+    "tool": "propose_fill",
+    "ref": "ref_6",
+    "field_key": "full_name"
+  },
+  {
+    "tool": "propose_fill",
+    "ref": "ref_7",
+    "field_key": "email"
+  },
+  {
+    "tool": "propose_fill",
+    "ref": "ref_8",
+    "field_key": "street_address"
+  },
+  {
+    "tool": "propose_click",
+    "ref": "ref_9"
+  },
+  {
+    "tool": "observe"
+  },
+  {
+    "tool": "propose_fill",
+    "ref": "ref_6",
+    "field_key": "card_number"
+  },
+  {
+    "tool": "propose_fill",
+    "ref": "ref_7",
+    "field_key": "expiry"
+  },
+  {
+    "tool": "propose_fill",
+    "ref": "ref_8",
+    "field_key": "cvc"
+  },
+  {
+    "tool": "propose_click",
+    "ref": "ref_9"
+  },
+  {
+    "tool": "observe"
+  },
+  {
+    "tool": "propose_click",
+    "ref": "ref_6"
+  }
+]
