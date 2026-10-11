@@ -3,6 +3,7 @@
 from enum import Enum
 import hashlib
 import json
+import re
 from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -221,4 +222,166 @@ class RunResult(BaseModel):
     evidence: dict[str, Any] = Field(default_factory=dict)
     agent_explanation: str | None = None
     verification: VerificationResult | None = None
+
+
+# -------------------------------------------------------------
+# Module 6: UI Snapshot and Diff Models
+# -------------------------------------------------------------
+
+_CREDIT_CARD_REGEX = re.compile(r"\b(?:\d[ -]*?){13,19}\b")
+
+
+class UIElement(BaseModel):
+    """Structural information of an interactive or key UI element.
+
+    Strict privacy: Never contains input values, passwords, card details, cookies, or tokens.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    role: str
+    name: str
+    label: str | None = None
+    element_id: str | None = None
+    tag_name: str
+    element_type: str | None = None
+    placeholder: str | None = None
+    input_name: str | None = None
+    heading: str | None = None
+    page_path: str = "/"
+    enabled: bool = True
+    visible: bool = True
+
+    @model_validator(mode="after")
+    def verify_privacy_invariants(self) -> "UIElement":
+        """Verify no sensitive data (card numbers, secrets) is captured in structural fields."""
+        fields_to_check = [
+            self.role,
+            self.name,
+            self.label or "",
+            self.element_id or "",
+            self.placeholder or "",
+            self.heading or "",
+        ]
+        for field in fields_to_check:
+            if _CREDIT_CARD_REGEX.search(field):
+                raise ValueError("Privacy violation: UIElement contains credit card number")
+        return self
+
+
+class PageSnapshot(BaseModel):
+    """Snapshot of structural UI information for a single page."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    page_path: str
+    title: str = ""
+    headings: list[str] = Field(default_factory=list)
+    elements: list[UIElement] = Field(default_factory=list)
+
+
+class UIInventory(BaseModel):
+    """Inventory of structural UI information across pages of a version / workflow."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    intent_id: str
+    app_version: str
+    pages: list[PageSnapshot] = Field(default_factory=list)
+    created_at: str | None = None
+
+    @property
+    def all_elements(self) -> list[UIElement]:
+        """Aggregate all elements across all pages."""
+        items: list[UIElement] = []
+        for p in self.pages:
+            items.extend(p.elements)
+        return items
+
+    @property
+    def page_paths(self) -> list[str]:
+        """Return list of distinct page paths in order."""
+        return [p.page_path for p in self.pages]
+
+    def get_page(self, path: str) -> PageSnapshot | None:
+        """Find page snapshot by path."""
+        for p in self.pages:
+            if p.page_path == path:
+                return p
+        return None
+
+    def find_elements(
+        self, role: str | None = None, name: str | None = None
+    ) -> list[UIElement]:
+        """Filter elements across all pages by role and/or accessible name."""
+        results = self.all_elements
+        if role is not None:
+            results = [e for e in results if e.role.lower() == role.lower()]
+        if name is not None:
+            results = [e for e in results if e.name.lower() == name.lower()]
+        return results
+
+
+class RenamedElement(BaseModel):
+    """Mapping between a baseline element and a renamed element in the current UI."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    old_element: UIElement
+    new_element: UIElement
+    old_name: str
+    new_name: str
+    confidence: float = 1.0
+
+
+class AmbiguousElement(BaseModel):
+    """Element matching multiple candidates or having duplicate accessible names."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    element: UIElement
+    matching_candidates: list[UIElement] = Field(default_factory=list)
+    reason: str
+
+
+class FlowDiff(BaseModel):
+    """Comparison of page paths / navigation flow between baseline and current."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    baseline_paths: list[str]
+    current_paths: list[str]
+    is_flow_changed: bool
+    added_paths: list[str] = Field(default_factory=list)
+    removed_paths: list[str] = Field(default_factory=list)
+
+
+class SnapshotDiff(BaseModel):
+    """Complete diff report comparing baseline UI to current UI."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    unchanged: list[UIElement] = Field(default_factory=list)
+    added: list[UIElement] = Field(default_factory=list)
+    removed: list[UIElement] = Field(default_factory=list)
+    renamed: list[RenamedElement] = Field(default_factory=list)
+    ambiguous: list[AmbiguousElement] = Field(default_factory=list)
+    flow: FlowDiff | None = None
+    has_drift: bool = False
+
+    def summary(self) -> dict[str, Any]:
+        """Return dictionary summary of diff metrics."""
+        return {
+            "unchanged_count": len(self.unchanged),
+            "added_count": len(self.added),
+            "removed_count": len(self.removed),
+            "renamed_count": len(self.renamed),
+            "ambiguous_count": len(self.ambiguous),
+            "has_drift": self.has_drift,
+            "is_flow_changed": self.flow.is_flow_changed if self.flow else False,
+        }
+
+    def get_renamed_map(self) -> dict[str, str]:
+        """Return a mapping of old accessible names to new accessible names."""
+        return {r.old_name: r.new_name for r in self.renamed}
 

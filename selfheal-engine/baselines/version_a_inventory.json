@@ -1,0 +1,166 @@
+{
+  "intent_id": "checkout",
+  "app_version": "a",
+  "pages": [
+    {
+      "page_path": "/v/a/",
+      "title": "Checkout - Version A",
+      "headings": [
+        "Order Summary",
+        "Payment & Shipping Details"
+      ],
+      "elements": [
+        {
+          "role": "link",
+          "name": "SelfHeal Shop",
+          "label": null,
+          "element_id": null,
+          "tag_name": "a",
+          "element_type": null,
+          "placeholder": null,
+          "input_name": null,
+          "heading": "Order Summary",
+          "page_path": "/v/a/",
+          "enabled": true,
+          "visible": true
+        },
+        {
+          "role": "textbox",
+          "name": "Name",
+          "label": "Name",
+          "element_id": "name",
+          "tag_name": "input",
+          "element_type": "text",
+          "placeholder": null,
+          "input_name": "name",
+          "heading": "Payment & Shipping Details",
+          "page_path": "/v/a/",
+          "enabled": true,
+          "visible": true
+        },
+        {
+          "role": "textbox",
+          "name": "Email",
+          "label": "Email",
+          "element_id": "email",
+          "tag_name": "input",
+          "element_type": "email",
+          "placeholder": null,
+          "input_name": "email",
+          "heading": "Payment & Shipping Details",
+          "page_path": "/v/a/",
+          "enabled": true,
+          "visible": true
+        },
+        {
+          "role": "textbox",
+          "name": "Address",
+          "label": "Address",
+          "element_id": "address",
+          "tag_name": "input",
+          "element_type": "text",
+          "placeholder": null,
+          "input_name": "address",
+          "heading": "Payment & Shipping Details",
+          "page_path": "/v/a/",
+          "enabled": true,
+          "visible": true
+        },
+        {
+          "role": "textbox",
+          "name": "Card number",
+          "label": "Card number",
+          "element_id": "card_number",
+          "tag_name": "input",
+          "element_type": "text",
+          "placeholder": null,
+          "input_name": "card_number",
+          "heading": "Payment & Shipping Details",
+          "page_path": "/v/a/",
+          "enabled": true,
+          "visible": true
+        },
+        {
+          "role": "textbox",
+          "name": "Expiry",
+          "label": "Expiry",
+          "element_id": "expiry",
+          "tag_name": "input",
+          "element_type": "text",
+          "placeholder": "MM/YY",
+          "input_name": "expiry",
+          "heading": "Payment & Shipping Details",
+          "page_path": "/v/a/",
+          "enabled": true,
+          "visible": true
+        },
+        {
+          "role": "textbox",
+          "name": "CVC",
+          "label": "CVC",
+          "element_id": "cvc",
+          "tag_name": "input",
+          "element_type": "text",
+          "placeholder": null,
+          "input_name": "cvc",
+          "heading": "Payment & Shipping Details",
+          "page_path": "/v/a/",
+          "enabled": true,
+          "visible": true
+        },
+        {
+          "role": "button",
+          "name": "Checkout",
+          "label": null,
+          "element_id": "checkout-button",
+          "tag_name": "button",
+          "element_type": "submit",
+          "placeholder": null,
+          "input_name": null,
+          "heading": "Payment & Shipping Details",
+          "page_path": "/v/a/",
+          "enabled": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "page_path": "/v/a/confirmation",
+      "title": "Order Confirmed - Version A",
+      "headings": [
+        "Order confirmed"
+      ],
+      "elements": [
+        {
+          "role": "link",
+          "name": "SelfHeal Shop",
+          "label": null,
+          "element_id": null,
+          "tag_name": "a",
+          "element_type": null,
+          "placeholder": null,
+          "input_name": null,
+          "heading": "Order confirmed",
+          "page_path": "/v/a/confirmation",
+          "enabled": true,
+          "visible": true
+        },
+        {
+          "role": "link",
+          "name": "Return to Home",
+          "label": null,
+          "element_id": null,
+          "tag_name": "a",
+          "element_type": null,
+          "placeholder": null,
+          "input_name": null,
+          "heading": "Order confirmed",
+          "page_path": "/v/a/confirmation",
+          "enabled": true,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "created_at": "2026-10-11T04:27:31.273155+00:00"
+}
