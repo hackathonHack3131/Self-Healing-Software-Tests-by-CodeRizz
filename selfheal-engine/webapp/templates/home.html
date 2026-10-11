@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SelfHeal Studio — Intent-Aware Autonomous E2E Testing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Professional Shared Header -->
+    <header class="app-header">
+      <div class="brand">
+        <a href="/" class="brand-link">
+          <div class="brand-logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">SelfHeal <span class="brand-sub">Studio</span></div>
+            <div class="brand-tagline">Intent-Aware E2E Testing • Survives UI Redesigns</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="nav-links">
+        <a href="/" class="nav-link active">Home</a>
+        <a href="/demo" class="nav-link">Interactive Demo</a>
+        <a href="/about" class="nav-link">Architecture & About</a>
+        <a href="/contact" class="nav-link">Contact Us</a>
+      </nav>
+
+      <!-- Telemetry & Actions -->
+      <div class="header-actions">
+        <div class="telemetry-bar">
+          <div class="telemetry-pill">
+            <span class="status-dot dot-live"></span>
+            <span class="pill-label">MongoDB:</span>
+            <span class="pill-val" id="mongoVal">Live</span>
+          </div>
+          <div class="telemetry-pill">
+            <span class="status-dot dot-purple"></span>
+            <span class="pill-label">Target:</span>
+            <span class="pill-val">:5000</span>
+          </div>
+        </div>
+        <a href="/demo" class="btn btn-primary btn-sm">Launch Demo &rarr;</a>
+      </div>
+    </header>
+
+    <!-- Main Landing Content -->
+    <main class="page-content">
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <h1 class="hero-title">End-to-End Testing That Survives UI Redesigns</h1>
+        <p class="hero-subtitle">
+          Traditional tests break when buttons move or single-page checkouts turn into multi-step wizards.
+          <strong>SelfHeal</strong> binds tests to <em>immutable business intent</em>, reconstructs multi-step workflows
+          autonomously using Deep Agents, and <strong>deterministically refuses to heal</strong> genuine application defects.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="/demo" class="btn btn-primary btn-lg">
+            <span>Launch Interactive Demo</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="/about" class="btn btn-secondary btn-lg">
+            <span>Architecture & Global Rules</span>
+          </a>
+        </div>
+
+        <!-- Proof Metrics Bar -->
+        <div class="proof-bar">
+          <div class="proof-item">
+            <div class="proof-num">0</div>
+            <div class="proof-label">LLM Calls on Baseline</div>
+            <div class="proof-sub">Passing tests run directly without AI overhead</div>
+          </div>
+          <div class="proof-divider"></div>
+          <div class="proof-item">
+            <div class="proof-num">100%</div>
+            <div class="proof-label">Deterministic Verification</div>
+            <div class="proof-sub">Verified on clean replay in fresh browser</div>
+          </div>
+          <div class="proof-divider"></div>
+          <div class="proof-item">
+            <div class="proof-num">4-in-1</div>
+            <div class="proof-label">Multi-Step Reconstruction</div>
+            <div class="proof-sub">Rebuilds complete workflows, not just 1 locator</div>
+          </div>
+          <div class="proof-divider"></div>
+          <div class="proof-item">
+            <div class="proof-num">Zero</div>
+            <div class="proof-label">Falsely Healed Bugs</div>
+            <div class="proof-sub">Strictly refuses to mask server 500 or math errors</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Problem vs Solution Comparison Section -->
+      <section class="section-container">
+        <div class="section-header">
+          <span class="section-tag">PARADIGM SHIFT</span>
+          <h2>The Problem vs. The SelfHeal Solution</h2>
+          <p>Why modern engineering teams waste hours fixing brittle test suites, and how intent-aware testing eliminates maintenance toil.</p>
+        </div>
+
+        <div class="comparison-grid">
+          <!-- Left: Traditional Brittle Testing -->
+          <div class="comparison-card comp-fragile">
+            <div class="comp-badge badge-bug">Traditional Brittle Tests</div>
+            <h3>Fragile Selectors & Fixed Paths</h3>
+            <ul class="comp-list">
+              <li>
+                <strong>Rigid Locators:</strong> Bound to brittle selectors like <code class="code-inline">click("#checkout-btn")</code> or fragile XPath.
+              </li>
+              <li>
+                <strong>Breaks on Harmless Redesign:</strong> Converting a single form into a multi-step wizard breaks the entire test suite.
+              </li>
+              <li>
+                <strong>Endless Engineering Maintenance:</strong> Teams spend hours repairing locator syntax instead of verifying business functionality.
+              </li>
+              <li>
+                <strong>Flaky & Opaque:</strong> Fails with generic <code class="code-inline">ElementNotFoundException</code> without root cause triage.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Right: SelfHeal Autonomous Testing -->
+          <div class="comparison-card comp-selfheal">
+            <div class="comp-badge badge-pass">SelfHeal Intent Architecture</div>
+            <h3>Immutable Goals & Adaptive Workflows</h3>
+            <ul class="comp-list">
+              <li>
+                <strong>Immutable Intent Contract:</strong> Test specifies business goal (<code class="code-inline">"Complete checkout with a valid credit card"</code>) and invariants.
+              </li>
+              <li>
+                <strong>Autonomous Workflow Reconstruction:</strong> Detects UI drift, discovers new wizard pages, and reconstructs the full multi-step path.
+              </li>
+              <li>
+                <strong>Strict Defect Classification:</strong> Rule engine identifies genuine bugs (HTTP 500, math errors) and refuses to falsely heal them.
+              </li>
+              <li>
+                <strong>Clean Replay Verification:</strong> Re-executes the rebuilt recipe from scratch in an isolated browser session. The AI never decides pass/fail.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- The 4 Demonstration Scenarios -->
+      <section class="section-container">
+        <div class="section-header">
+          <span class="section-tag">VERIFICATION SCENARIOS</span>
+          <h2>4 Live Verification Scenarios</h2>
+          <p>Explore the four distinct scenarios implemented to prove the core requirements of the problem statement.</p>
+        </div>
+
+        <div class="scenarios-grid">
+          <div class="scenario-card">
+            <div class="scenario-top">
+              <span class="badge badge-pass">PASS_NO_HEAL</span>
+              <span class="scenario-tag">Version A</span>
+            </div>
+            <h4>1. Passing Baseline</h4>
+            <p>Single-page checkout form. Recipe v1 executes cleanly in the browser. Verifier passes invariants with exactly <strong>zero LLM calls</strong>.</p>
+            <a href="/demo?run=a" class="scenario-link">Run Version A in Demo &rarr;</a>
+          </div>
+
+          <div class="scenario-card">
+            <div class="scenario-top">
+              <span class="badge badge-heal">PASS_AFTER_HEAL</span>
+              <span class="scenario-tag">Version B</span>
+            </div>
+            <h4>2. UI Redesign & Auto-Heal</h4>
+            <p>Application redesigned from single page to a 4-step wizard. SelfHeal detects UI drift, reconstructs 10 validated actions, and saves <strong>Recipe v2</strong>.</p>
+            <a href="/demo?run=b" class="scenario-link">Run Version B in Demo &rarr;</a>
+          </div>
+
+          <div class="scenario-card">
+            <div class="scenario-top">
+              <span class="badge badge-bug">FAIL_FUNCTIONAL</span>
+              <span class="scenario-tag">Version C</span>
+            </div>
+            <h4>3. Server Defect Defense</h4>
+            <p>Checkout form throws an HTTP 500 internal server error alert. Rule engine classifies <strong>APP_BUG</strong> and strictly refuses to heal, catching the bug.</p>
+            <a href="/demo?run=c" class="scenario-link">Run Version C in Demo &rarr;</a>
+          </div>
+
+          <div class="scenario-card">
+            <div class="scenario-top">
+              <span class="badge badge-bug">FAIL_FUNCTIONAL</span>
+              <span class="scenario-tag">Version D</span>
+            </div>
+            <h4>4. Invariant Math Defect</h4>
+            <p>Order completes, but the final total calculation displays $32.50 instead of $36.50. Deterministic verifier catches the invariant mismatch.</p>
+            <a href="/demo?run=d" class="scenario-link">Run Version D in Demo &rarr;</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Core Architectural Pillars -->
+      <section class="section-container">
+        <div class="section-header">
+          <span class="section-tag">ENGINEERING INTEGRITY</span>
+          <h2>Core System Principles</h2>
+          <p>Built with strict constraints to ensure automated testing is safe, predictable, and enterprise-ready.</p>
+        </div>
+
+        <div class="pillars-grid">
+          <div class="pillar-card">
+            <h4>Immutable Intent</h4>
+            <p>The goal and invariants are cryptographically hashed. The agent can never modify test criteria or expectations to force a pass.</p>
+          </div>
+
+          <div class="pillar-card">
+            <h4>Deterministic Verifier</h4>
+            <p>AI models propose actions, but only deterministic code decides pass or fail during a from-scratch replay in a fresh browser session.</p>
+          </div>
+
+          <div class="pillar-card">
+            <h4>No Generated Scripts</h4>
+            <p>No LLM-generated Python, JavaScript, shell, eval, or exec. The model proposes strictly typed semantic actions validated before execution.</p>
+          </div>
+
+          <div class="pillar-card">
+            <h4>Local MongoDB Persistence</h4>
+            <p>Every execution, UI diff, triage diagnosis, and versioned recipe (<code class="code-inline">v1</code> &rarr; <code class="code-inline">v2</code>) is logged with complete cryptographic lineage.</p>
+          </div>
+
+          <div class="pillar-card">
+            <h4>Origin Allowlist Guard</h4>
+            <p>Strict network routing ensures the browser automation visits only registered, allowlisted target endpoints (<code class="code-inline">:5000</code>).</p>
+          </div>
+
+          <div class="pillar-card">
+            <h4>AOM Accessibility Snapshots</h4>
+            <p>Structural comparisons rely on accessible names, roles, and headings. Sensitive passwords and credit card inputs are never stored.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive Call to Action Banner -->
+      <section class="cta-banner">
+        <div class="cta-content">
+          <h3>Ready to experience autonomous self-healing in action?</h3>
+          <p>Test the live target shop against all 4 versions and inspect real-time Playwright execution, UI diffs, and MongoDB audit logs.</p>
+        </div>
+        <div class="cta-action">
+          <a href="/demo" class="btn btn-primary btn-lg">Launch Studio Demo &rarr;</a>
+        </div>
+      </section>
+    </main>
+
+    <!-- Professional Shared Footer -->
+    <footer class="app-footer">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="brand-title">SelfHeal <span class="brand-sub">Studio</span></div>
+          <p class="footer-desc">
+            Intent-aware, autonomous end-to-end testing system that survives interface redesigns without modifying test contracts.
+          </p>
+          <div class="footer-status-pill">
+            <span class="status-dot dot-live"></span>
+            <span>Local MongoDB: Connected (localhost:27017)</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading">Navigation</div>
+          <ul class="footer-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/demo">Interactive Studio Demo</a></li>
+            <li><a href="/about">Architecture & Global Rules</a></li>
+            <li><a href="/contact">Contact & Feedback</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading">Verification Scenarios</div>
+          <ul class="footer-links">
+            <li><a href="/demo?run=a">Version A (Baseline Pass)</a></li>
+            <li><a href="/demo?run=b">Version B (Multi-Step Healing)</a></li>
+            <li><a href="/demo?run=c">Version C (Server Bug Rejection)</a></li>
+            <li><a href="/demo?run=d">Version D (Invariant Math Defense)</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading">Project Info</div>
+          <ul class="footer-links">
+            <li><span>Domain: Software Engineering</span></li>
+            <li><span>Category: Autonomous E2E Testing</span></li>
+            <li><span>Team: CodeRizz</span></li>
+            <li><span>Repository: selfheal-engine</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 SelfHeal by CodeRizz. All rights reserved.</div>
+        <div class="footer-tech-stack">Built with Async Playwright &bull; LangChain Deep Agents &bull; Flask &bull; MongoDB</div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Fetch live system status for header pill
+    fetch('/api/status').then(r => r.json()).then(data => {
+      const el = document.getElementById('mongoVal');
+      if (el && data.db && data.db.connected) {
+        el.textContent = `Live (${data.db.runs_count} runs)`;
+      }
+    }).catch(() => {});
+  </script>
+</body>
+</html>

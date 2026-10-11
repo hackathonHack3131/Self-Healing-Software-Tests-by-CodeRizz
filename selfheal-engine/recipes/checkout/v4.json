@@ -1,0 +1,104 @@
+{
+  "intent_id": "checkout",
+  "version": 4,
+  "steps": [
+    {
+      "action": "goto_start",
+      "target": null,
+      "field_key": null
+    },
+    {
+      "action": "click_button",
+      "target": {
+        "by": "role",
+        "name": "Proceed to shipping",
+        "role": "button"
+      },
+      "field_key": null
+    },
+    {
+      "action": "fill_field",
+      "target": {
+        "by": "label",
+        "name": "Full name",
+        "role": null
+      },
+      "field_key": "full_name"
+    },
+    {
+      "action": "fill_field",
+      "target": {
+        "by": "label",
+        "name": "Email address",
+        "role": null
+      },
+      "field_key": "email"
+    },
+    {
+      "action": "fill_field",
+      "target": {
+        "by": "label",
+        "name": "Street address",
+        "role": null
+      },
+      "field_key": "street_address"
+    },
+    {
+      "action": "click_button",
+      "target": {
+        "by": "role",
+        "name": "Continue to payment",
+        "role": "button"
+      },
+      "field_key": null
+    },
+    {
+      "action": "fill_field",
+      "target": {
+        "by": "label",
+        "name": "Credit card #",
+        "role": null
+      },
+      "field_key": "card_number"
+    },
+    {
+      "action": "fill_field",
+      "target": {
+        "by": "label",
+        "name": "Valid thru (MM/YY)",
+        "role": null
+      },
+      "field_key": "expiry"
+    },
+    {
+      "action": "fill_field",
+      "target": {
+        "by": "label",
+        "name": "Security code",
+        "role": null
+      },
+      "field_key": "cvc"
+    },
+    {
+      "action": "click_button",
+      "target": {
+        "by": "role",
+        "name": "Review order",
+        "role": "button"
+      },
+      "field_key": null
+    },
+    {
+      "action": "click_button",
+      "target": {
+        "by": "role",
+        "name": "Place order securely",
+        "role": "button"
+      },
+      "field_key": null
+    }
+  ],
+  "created_by": "agent",
+  "parent_version": 1,
+  "intent_hash": "db69d87f31507d48da0153d308424a2e3c2935e00d2e8830f06c5ee0e475aed8"
+}

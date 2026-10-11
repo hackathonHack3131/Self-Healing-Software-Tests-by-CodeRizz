@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Studio Demo — SelfHeal E2E Testing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Professional Shared Header -->
+    <header class="app-header">
+      <div class="brand">
+        <a href="/" class="brand-link">
+          <div class="brand-logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">SelfHeal <span class="brand-sub">Studio</span></div>
+            <div class="brand-tagline">Autonomous Intent-Aware E2E Testing System</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/demo" class="nav-link active">Interactive Demo</a>
+        <a href="/about" class="nav-link">Architecture & About</a>
+        <a href="/contact" class="nav-link">Contact Us</a>
+      </nav>
+
+      <!-- Live System Badges -->
+      <div class="header-actions">
+        <div class="telemetry-bar">
+          <div class="telemetry-pill" id="mongoPill">
+            <span class="status-dot dot-live" id="mongoDot"></span>
+            <span class="pill-label">MongoDB:</span>
+            <span class="pill-val" id="mongoVal">Connecting...</span>
+          </div>
+          <div class="telemetry-pill" id="llmPill">
+            <span class="status-dot dot-blue" id="llmDot"></span>
+            <span class="pill-label">Healer Engine:</span>
+            <span class="pill-val" id="llmVal">Initializing</span>
+          </div>
+          <div class="telemetry-pill" id="targetPill">
+            <span class="status-dot dot-purple"></span>
+            <span class="pill-label">Target:</span>
+            <span class="pill-val" id="targetVal">:5000</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Problem Statement & Challenge Demo Controls -->
+    <section class="demo-banner">
+      <div class="banner-header">
+        <h2>Interactive Testing Studio & Verification Engine</h2>
+        <p class="challenge-desc">
+          Traditional tests break when selectors change (<code class="code-inline">click("#checkout-button")</code>). 
+          <strong>SelfHeal</strong> executes tests from <em>immutable intent</em> (<code class="code-inline">"Complete checkout with a valid credit card"</code>), 
+          autonomously rebuilds multi-step workflows when the UI is redesigned, and distinguishes UI drift from real application bugs.
+        </p>
+      </div>
+
+      <!-- Interactive 1-Click Demo Buttons -->
+      <div class="demo-actions-grid">
+        <button class="action-card btn-demo-a" id="btnDemoA" onclick="triggerRun('a')">
+          <div class="card-content">
+            <div class="card-title">1. Run Baseline (Version A)</div>
+            <div class="card-desc">Single-page checkout &bull; Passes cleanly with Recipe v1 (Zero healing)</div>
+          </div>
+          <span class="badge badge-pass">PASS_NO_HEAL</span>
+        </button>
+
+        <button class="action-card btn-demo-b" id="btnDemoB" onclick="triggerRun('b')">
+          <div class="card-content">
+            <div class="card-title">2. UI Drift & Auto-Heal (Version B)</div>
+            <div class="card-desc">Multi-step redesign &bull; Detects drift, rebuilds workflow, verifies & saves Recipe v2</div>
+          </div>
+          <span class="badge badge-heal">PASS_AFTER_HEAL</span>
+        </button>
+
+        <button class="action-card btn-demo-c" id="btnDemoC" onclick="triggerRun('c')">
+          <div class="card-content">
+            <div class="card-title">3. Detect Real Server Bug (Version C)</div>
+            <div class="card-desc">Submit throws HTTP 500 &bull; Triage detects APP_BUG and refuses to falsely heal</div>
+          </div>
+          <span class="badge badge-bug">FAIL_FUNCTIONAL</span>
+        </button>
+
+        <button class="action-card btn-demo-d" id="btnDemoD" onclick="triggerRun('d')">
+          <div class="card-content">
+            <div class="card-title">4. Detect Invariant Bug (Version D)</div>
+            <div class="card-desc">Wrong total $32.50 vs $36.50 &bull; Verifier catches calculation invariant failure</div>
+          </div>
+          <span class="badge badge-bug">FAIL_FUNCTIONAL</span>
+        </button>
+
+        <button class="action-card btn-reset" id="btnReset" onclick="resetEnvironment()">
+          <div class="card-content">
+            <div class="card-title">Reset Environment</div>
+            <div class="card-desc">Restore Recipe v1 baseline & clear MongoDB test runs</div>
+          </div>
+          <span class="badge badge-neutral">RESET</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Main Workspace (2-Column Grid) -->
+    <main class="workspace-grid">
+      <!-- Left Column: Test Runner, Execution Stepper & Logs -->
+      <div class="workspace-col runner-col">
+        <!-- Control Bar -->
+        <div class="glass-panel runner-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+              </svg>
+              Live Execution Runner
+            </div>
+            <div class="version-selector-group">
+              <label for="targetVersion">Target:</label>
+              <select id="targetVersion" class="custom-select" onchange="onVersionChange(this.value)">
+                <option value="a">Version A (Single Page)</option>
+                <option value="b" selected>Version B (Multi-Step Redesign)</option>
+                <option value="c">Version C (HTTP 500 Bug)</option>
+                <option value="d">Version D (Wrong Total Bug)</option>
+              </select>
+              <button class="btn btn-primary" id="btnRunMain" onclick="triggerRunFromSelect()">
+                <span class="btn-spinner" id="btnSpinner" style="display: none;"></span>
+                <span id="btnRunText">Run Test</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Phase Progress Indicator -->
+          <div class="phase-stepper">
+            <div class="phase-step step-idle" id="stepInit">
+              <div class="phase-num">1</div>
+              <div class="phase-label">Load Intent</div>
+            </div>
+            <div class="phase-connector" id="conn1"></div>
+            <div class="phase-step step-idle" id="stepExecute">
+              <div class="phase-num">2</div>
+              <div class="phase-label">Execute</div>
+            </div>
+            <div class="phase-connector" id="conn2"></div>
+            <div class="phase-step step-idle" id="stepTriage">
+              <div class="phase-num">3</div>
+              <div class="phase-label">Triage & Diff</div>
+            </div>
+            <div class="phase-connector" id="conn3"></div>
+            <div class="phase-step step-idle" id="stepHeal">
+              <div class="phase-num">4</div>
+              <div class="phase-label">Deep Heal</div>
+            </div>
+            <div class="phase-connector" id="conn4"></div>
+            <div class="phase-step step-idle" id="stepVerify">
+              <div class="phase-num">5</div>
+              <div class="phase-label">Verify & DB</div>
+            </div>
+          </div>
+
+          <!-- Status Result Banner -->
+          <div class="result-banner" id="resultBanner" style="display: none;">
+            <div class="result-header">
+              <div class="result-badge-container">
+                <span class="status-pill-large" id="resStatusBadge">STATUS</span>
+                <span class="res-version-tag" id="resVersionTag">VERSION</span>
+              </div>
+              <div class="res-duration" id="resDuration">0.0 ms</div>
+            </div>
+            <div class="result-title" id="resTitle">Execution Complete</div>
+            <div class="result-explanation" id="resExplanation">...</div>
+          </div>
+
+          <!-- Real-Time Stepper Execution Log -->
+          <div class="steps-container">
+            <div class="steps-header">
+              <span>Executed Workflow Steps</span>
+              <span class="steps-counter" id="stepsCounter">0 steps</span>
+            </div>
+            <div class="steps-list" id="stepsList">
+              <div class="empty-state">
+                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                <p>Click any demo button above or select a version to run the intent-aware testing engine.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Deep Inspection Tabs -->
+      <div class="workspace-col tabs-col">
+        <div class="glass-panel tabs-panel">
+          <!-- Tab Navigation -->
+          <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('tabDiff')">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+              UI Diff & Drift
+            </button>
+            <button class="tab-btn" onclick="switchTab('tabRecipe')">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Recipe Inspector
+            </button>
+            <button class="tab-btn" onclick="switchTab('tabIntent')">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Immutable Intent
+            </button>
+            <button class="tab-btn" onclick="switchTab('tabPreview')">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Live Target Preview
+            </button>
+            <button class="tab-btn" onclick="switchTab('tabHistory')">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              MongoDB History (<span id="mongoCount">0</span>)
+            </button>
+          </div>
+
+          <!-- Tab 1: UI Diff & Drift Analysis -->
+          <div class="tab-content active" id="tabDiff">
+            <div class="tab-header">
+              <h3>Structural UI Drift Analysis</h3>
+              <div class="diff-counters">
+                <span class="diff-badge badge-added" id="diffAddedCount">+0 Added</span>
+                <span class="diff-badge badge-removed" id="diffRemovedCount">-0 Removed</span>
+                <span class="diff-badge badge-renamed" id="diffRenamedCount">~0 Renamed</span>
+              </div>
+            </div>
+            <div class="diff-explanation-card">
+              <p>
+                SelfHeal captures full accessible role and semantic inventory before and after UI redesigns. 
+                When Version B was introduced, elements transitioned from a single-page form to a 4-step wizard.
+              </p>
+            </div>
+            <div class="diff-details-tree" id="diffDetailsTree">
+              <div class="empty-state-small">Run a test to see live UI diff comparing baseline Version A with target.</div>
+            </div>
+          </div>
+
+          <!-- Tab 2: Recipe Inspector -->
+          <div class="tab-content" id="tabRecipe">
+            <div class="tab-header">
+              <h3>Versioned Recipe Inspector</h3>
+              <div class="recipe-version-badges" id="recipeVersionBadges">
+                <span class="version-tag active">v1 (Human)</span>
+              </div>
+            </div>
+            <div class="recipe-cards-container" id="recipeCardsContainer">
+              <div class="loading-state">Loading recipe versions...</div>
+            </div>
+          </div>
+
+          <!-- Tab 3: Immutable Intent -->
+          <div class="tab-content" id="tabIntent">
+            <div class="tab-header">
+              <h3>Immutable Intent Specification</h3>
+              <span class="hash-tag" id="intentHashTag">SHA-256: Loading...</span>
+            </div>
+            <div class="intent-overview-card" id="intentOverviewCard">
+              <div class="loading-state">Loading intent specifications...</div>
+            </div>
+          </div>
+
+          <!-- Tab 4: Live Target Preview -->
+          <div class="tab-content" id="tabPreview">
+            <div class="tab-header">
+              <h3>Target Shop Live Preview</h3>
+              <div class="preview-url-bar" id="previewUrlBar">http://127.0.0.1:5000/v/b/</div>
+            </div>
+            <div class="iframe-wrapper">
+              <iframe id="previewIframe" src="http://127.0.0.1:5000/v/b/" title="Live Shop Preview"></iframe>
+            </div>
+          </div>
+
+          <!-- Tab 5: MongoDB Run History -->
+          <div class="tab-content" id="tabHistory">
+            <div class="tab-header">
+              <h3>MongoDB Runs Collection (<code class="code-inline">selfheal.runs</code>)</h3>
+              <button class="btn btn-secondary btn-sm" onclick="loadRunsHistory()">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Refresh
+              </button>
+            </div>
+            <div class="history-table-container">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Target</th>
+                    <th>Status</th>
+                    <th>Healed?</th>
+                    <th>Recipe</th>
+                    <th>Duration</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                  <tr><td colspan="7" class="table-empty">No runs recorded in MongoDB yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Professional Shared Footer -->
+    <footer class="app-footer">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="brand-title">SelfHeal <span class="brand-sub">Studio</span></div>
+          <p class="footer-desc">
+            Intent-aware, autonomous end-to-end testing system that survives interface redesigns without modifying test contracts.
+          </p>
+          <div class="footer-status-pill">
+            <span class="status-dot dot-live"></span>
+            <span>Local MongoDB: Connected (localhost:27017)</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading">Navigation</div>
+          <ul class="footer-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/demo">Interactive Studio Demo</a></li>
+            <li><a href="/about">Architecture & Global Rules</a></li>
+            <li><a href="/contact">Contact & Feedback</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading">Verification Scenarios</div>
+          <ul class="footer-links">
+            <li><a href="/demo?run=a">Version A (Baseline Pass)</a></li>
+            <li><a href="/demo?run=b">Version B (Multi-Step Healing)</a></li>
+            <li><a href="/demo?run=c">Version C (Server Bug Rejection)</a></li>
+            <li><a href="/demo?run=d">Version D (Invariant Math Defense)</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading">Project Info</div>
+          <ul class="footer-links">
+            <li><span>Domain: Software Engineering</span></li>
+            <li><span>Category: Autonomous E2E Testing</span></li>
+            <li><span>Team: CodeRizz</span></li>
+            <li><span>Repository: selfheal-engine</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 SelfHeal by CodeRizz. All rights reserved.</div>
+        <div class="footer-tech-stack">Built with Async Playwright &bull; LangChain Deep Agents &bull; Flask &bull; MongoDB</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Run Detail Modal -->
+  <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="modalTitle">Run Details</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <pre><code id="modalJson"></code></pre>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+  <script>
+    // Handle URL parameters like ?run=b to auto-trigger specific version
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const runVer = params.get('run');
+      if (runVer && ['a', 'b', 'c', 'd'].includes(runVer)) {
+        setTimeout(() => triggerRun(runVer), 600);
+      }
+    });
+  </script>
+</body>
+</html>

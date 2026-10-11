@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+
+# Environment & secrets (Rule 10 & 30: Never include secrets in Docker image)
+.env
+.env.*
+!.env.example
+
+# Python virtual environment & caches
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Test runs, artifacts, traces & screenshots
+runs/
+*.log
+
+# Editor / IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker files
+Dockerfile
+docker-compose*.yml
+.dockerignore

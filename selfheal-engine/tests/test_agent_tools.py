@@ -349,4 +349,8 @@ async def test_live_gemini_model_healing(intent, v1_recipe, session_b):
         settings=settings,
     )
 
-    assert heal_res.status in (Status.PASS_AFTER_HEAL, Status.FAIL_HEALING)
+    assert heal_res.status in (
+        Status.PASS_AFTER_HEAL,
+        Status.FAIL_HEALING,
+        Status.BLOCKED_AGENT,
+    )

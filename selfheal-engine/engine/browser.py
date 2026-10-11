@@ -1,5 +1,6 @@
 """Async Playwright browser session manager with origin guard and monitor attachment."""
 
+import os
 from typing import Any
 from playwright.async_api import (
     Browser,
@@ -41,8 +42,16 @@ class BrowserSession:
             )
 
         self.playwright = await async_playwright().start()
+        launch_args = []
+        if (
+            os.getenv("PLAYWRIGHT_NO_SANDBOX", "false").lower() in ("true", "1", "yes")
+            or os.path.exists("/.dockerenv")
+        ):
+            launch_args.extend(["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"])
+
         self.browser = await self.playwright.chromium.launch(
-            headless=self.settings.HEADLESS
+            headless=self.settings.HEADLESS,
+            args=launch_args if launch_args else None,
         )
         self.context = await self.browser.new_context()
 

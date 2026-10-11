@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture & About — SelfHeal Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Professional Shared Header -->
+    <header class="app-header">
+      <div class="brand">
+        <a href="/" class="brand-link">
+          <div class="brand-logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">SelfHeal <span class="brand-sub">Studio</span></div>
+            <div class="brand-tagline">Intent-Aware E2E Testing • Survives UI Redesigns</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/demo" class="nav-link">Interactive Demo</a>
+        <a href="/about" class="nav-link active">Architecture & About</a>
+        <a href="/contact" class="nav-link">Contact Us</a>
+      </nav>
+
+      <!-- Telemetry & Actions -->
+      <div class="header-actions">
+        <div class="telemetry-bar">
+          <div class="telemetry-pill">
+            <span class="status-dot dot-live"></span>
+            <span class="pill-label">MongoDB:</span>
+            <span class="pill-val" id="mongoVal">Live</span>
+          </div>
+          <div class="telemetry-pill">
+            <span class="status-dot dot-purple"></span>
+            <span class="pill-label">Target:</span>
+            <span class="pill-val">:5000</span>
+          </div>
+        </div>
+        <a href="/demo" class="btn btn-primary btn-sm">Launch Demo &rarr;</a>
+      </div>
+    </header>
+
+    <!-- About Content -->
+    <main class="page-content">
+      <!-- Section Header -->
+      <div class="page-title-banner">
+        <span class="challenge-tag">TECHNICAL ARCHITECTURE & SPECIFICATIONS</span>
+        <h1>Architecture & Global System Rules</h1>
+        <p>A deep dive into how SelfHeal reconstructs multi-step workflows from immutable business intent without compromising safety, truthfulness, or verifier determinism.</p>
+      </div>
+
+      <!-- Section 1: The Core Philosophy -->
+      <div class="glass-panel content-block">
+        <div class="block-header">
+          <h2>1. The Problem With "Locator Renaming"</h2>
+        </div>
+        <div class="block-body">
+          <p>
+            Most commercial "AI test healing" tools implement a simplistic heuristic: if <code class="code-inline">#checkout-button</code> fails, search the DOM for a button with text "Checkout" and update the locator.
+          </p>
+          <p>
+            <strong>This fails completely in real-world software engineering.</strong> When a product undergoes a redesign, single-page forms are routinely split into multi-step wizards across separate routes (<code class="code-inline">/cart</code> &rarr; <code class="code-inline">/shipping</code> &rarr; <code class="code-inline">/payment</code> &rarr; <code class="code-inline">/review</code>). A locator replacement cannot solve this because the missing fields do not exist on the current page.
+          </p>
+          <p>
+            <strong>SelfHeal redefines healing as complete workflow reconstruction:</strong> The test is an immutable business goal with parameterised data and deterministic invariants. When UI drift is detected, an autonomous Deep Agent inspects the new interface, navigates through the multi-step stages, validates each action against security constraints, and builds a new candidate recipe from what actually executed.
+          </p>
+        </div>
+      </div>
+
+      <!-- Section 2: Global Rules (AGENTS.md) -->
+      <div class="glass-panel content-block">
+        <div class="block-header">
+          <h2>2. The Global Integrity Rules</h2>
+          <span class="badge badge-pass">Deterministic Safeguards</span>
+        </div>
+        <div class="block-body">
+          <div class="rules-table-container">
+            <table class="rules-table">
+              <thead>
+                <tr>
+                  <th style="width: 100px;">Rule</th>
+                  <th style="width: 220px;">Standard</th>
+                  <th>Enforcement Mechanism</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Rule 1</strong></td>
+                  <td><strong>Immutable Intent</strong></td>
+                  <td>The intent file, test data, and expected invariants are never modified. The cryptographic SHA-256 intent hash is verified every time a recipe is loaded.</td>
+                </tr>
+                <tr>
+                  <td><strong>Rule 2</strong></td>
+                  <td><strong>No Literal Data in Steps</strong></td>
+                  <td>Recipe steps never store hardcoded strings, passwords, or cards. Fill steps reference <code class="code-inline">field_key</code> identifiers only.</td>
+                </tr>
+                <tr>
+                  <td><strong>Rule 3</strong></td>
+                  <td><strong>Code Validates, Not LLMs</strong></td>
+                  <td>The model proposes steps; deterministic code validates and executes them. Zero LLM-generated Python, JavaScript, shell, eval, or exec.</td>
+                </tr>
+                <tr>
+                  <td><strong>Rule 4</strong></td>
+                  <td><strong>Controlled Semantic Actions</strong></td>
+                  <td>Only <code class="code-inline">goto_start</code>, <code class="code-inline">fill_field</code>, and <code class="code-inline">click_button</code> are permitted. Targets resolve to exactly one visible, enabled element matched by exact accessible name.</td>
+                </tr>
+                <tr>
+                  <td><strong>Rule 5</strong></td>
+                  <td><strong>Deterministic Verifier</strong></td>
+                  <td>Success is decided exclusively by deterministic code on a clean replay in a fresh browser context. The agent has no tool that declares success.</td>
+                </tr>
+                <tr>
+                  <td><strong>Rule 6</strong></td>
+                  <td><strong>Status Computed by Code</strong></td>
+                  <td>Status codes (<code class="code-inline">PASS_NO_HEAL</code>, <code class="code-inline">PASS_AFTER_HEAL</code>, <code class="code-inline">FAIL_FUNCTIONAL</code>) are computed by rules, never by the model. Model text is labeled as explanation.</td>
+                </tr>
+                <tr>
+                  <td><strong>Rule 9</strong></td>
+                  <td><strong>Origin Allowlist Guard</strong></td>
+                  <td>Chromium visits only registered origins (<code class="code-inline">http://127.0.0.1:5000</code>). All outbound requests outside the allowlist are aborted by client route guards.</td>
+                </tr>
+                <tr>
+                  <td><strong>Rule 12</strong></td>
+                  <td><strong>Never Fake AI</strong></td>
+                  <td>Missing config returns <code class="code-inline">BLOCKED_CONFIG</code>. Model rate limits (429) return <code class="code-inline">BLOCKED_AGENT</code>. Fallbacks to verified traces are strictly labeled <code class="code-inline">RECORDED</code> and must pass clean replay.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Technical Architecture -->
+      <div class="glass-panel content-block">
+        <div class="block-header">
+          <h2>3. Technical Components & Stack</h2>
+        </div>
+        <div class="block-body">
+          <div class="tech-grid">
+            <div class="tech-card">
+              <h4>Playwright Async Browser Engine</h4>
+              <p>Asynchronous headless Chromium execution via <code class="code-inline">async_playwright</code>. Built-in network routing guards, console error listeners, and live response monitoring.</p>
+            </div>
+            <div class="tech-card">
+              <h4>Accessible DOM (AOM) Snapshot</h4>
+              <p>Extracts accessible roles, names, and controls directly from the browser tree. Strips sensitive customer data, passwords, and payment inputs before analysis.</p>
+            </div>
+            <div class="tech-card">
+              <h4>Levenshtein Structural Diffing</h4>
+              <p>Compares live UI inventories against Version A baseline snapshots. Detects added, removed, and renamed controls with similarity confidence scores.</p>
+            </div>
+            <div class="tech-card">
+              <h4>Rule-Based Triage Engine</h4>
+              <p>Deterministic triage separates application bugs (HTTP 500, visible alert errors, invariant calculation mismatches) from harmless UI drift before any LLM is called.</p>
+            </div>
+            <div class="tech-card">
+              <h4>Deep Agent Observe-Act Healer</h4>
+              <p>LangChain / Deep Agents controller running streaming observe-act loops with subagent failure analysis, recursion limits, and proposal validation.</p>
+            </div>
+            <div class="tech-card">
+              <h4>Local MongoDB Persistence</h4>
+              <p>Connected to local MongoDB instance (<code class="code-inline">localhost:27017</code>). Collections for test execution runs, versioned recipes, and contact submissions with fallback support.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Team & Hackathon Specs -->
+      <div class="glass-panel content-block">
+        <div class="block-header">
+          <h2>4. Project & Submission Details</h2>
+        </div>
+        <div class="block-body">
+          <div class="meta-details-grid">
+            <div class="meta-item">
+              <span class="meta-label">Domain:</span>
+              <span class="meta-val">Autonomous Software Engineering &bull; E2E Testing</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Team:</span>
+              <span class="meta-val">CodeRizz</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Project Name:</span>
+              <span class="meta-val">Self-Healing Software Tests (SelfHeal)</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Core Runtime:</span>
+              <span class="meta-val">Python 3.12 + Playwright + Flask</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Database Backend:</span>
+              <span class="meta-val">MongoDB 7.0 (Local on port 27017)</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Agent Model:</span>
+              <span class="meta-val">Google Gemini 2.5 Flash / Deep Agent</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Professional Shared Footer -->
+    <footer class="app-footer">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="brand-title">SelfHeal <span class="brand-sub">Studio</span></div>
+          <p class="footer-desc">
+            Intent-aware, autonomous end-to-end testing system that survives interface redesigns without modifying test contracts.
+          </p>
+          <div class="footer-status-pill">
+            <span class="status-dot dot-live"></span>
+            <span>Local MongoDB: Connected (localhost:27017)</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading">Navigation</div>
+          <ul class="footer-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/demo">Interactive Studio Demo</a></li>
+            <li><a href="/about">Architecture & Global Rules</a></li>
+            <li><a href="/contact">Contact & Feedback</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading">Verification Scenarios</div>
+          <ul class="footer-links">
+            <li><a href="/demo?run=a">Version A (Baseline Pass)</a></li>
+            <li><a href="/demo?run=b">Version B (Multi-Step Healing)</a></li>
+            <li><a href="/demo?run=c">Version C (Server Bug Rejection)</a></li>
+            <li><a href="/demo?run=d">Version D (Invariant Math Defense)</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading">Project Info</div>
+          <ul class="footer-links">
+            <li><span>Domain: Software Engineering</span></li>
+            <li><span>Category: Software Engineering</span></li>
+            <li><span>Team: CodeRizz</span></li>
+            <li><span>Repository: selfheal-engine</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 SelfHeal by CodeRizz. All rights reserved.</div>
+        <div class="footer-tech-stack">Built with Async Playwright &bull; LangChain Deep Agents &bull; Flask &bull; MongoDB</div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    fetch('/api/status').then(r => r.json()).then(data => {
+      const el = document.getElementById('mongoVal');
+      if (el && data.db && data.db.connected) {
+        el.textContent = `Live (${data.db.runs_count} runs)`;
+      }
+    }).catch(() => {});
+  </script>
+</body>
+</html>

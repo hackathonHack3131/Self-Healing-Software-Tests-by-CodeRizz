@@ -1,0 +1,49 @@
+services:
+  demo-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: selfheal-engine:latest
+    container_name: selfheal-demo-app
+    ports:
+      - "5000:5000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=5000
+      - APP_ENV=local
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health')\""]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+  engine-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: selfheal-engine:latest
+    container_name: selfheal-engine-tests
+    command: ["pytest", "-v"]
+    environment:
+      - HEADLESS=true
+    profiles:
+      - test
+
+  dev-run:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: selfheal-engine:latest
+    container_name: selfheal-dev-run
+    command: ["python", "scripts/dev_run.py", "--version", "a"]
+    environment:
+      - DEMO_BASE_URL=http://demo-app:5000
+      - ALLOWED_ORIGINS=http://demo-app:5000
+      - HEADLESS=true
+    depends_on:
+      demo-app:
+        condition: service_healthy
+    profiles:
+      - runner
