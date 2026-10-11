@@ -385,3 +385,72 @@ class SnapshotDiff(BaseModel):
         """Return a mapping of old accessible names to new accessible names."""
         return {r.old_name: r.new_name for r in self.renamed}
 
+
+# -------------------------------------------------------------
+# Module 7: Failure Classification and Context Models
+# -------------------------------------------------------------
+
+class Verdict(str, Enum):
+    """Triage verdict categories."""
+
+    UI_DRIFT = "UI_DRIFT"
+    APP_BUG = "APP_BUG"
+    FLAKY = "FLAKY"
+    UNKNOWN = "UNKNOWN"
+
+
+class RecommendedAction(str, Enum):
+    """Next action recommended by the rule-based triage classifier."""
+
+    HEAL = "HEAL"
+    REPORT = "REPORT"
+    RETRY = "RETRY"
+    REVIEW = "REVIEW"
+
+
+class Triage(BaseModel):
+    """Deterministic failure triage decision with confidence and supporting evidence."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    verdict: Verdict
+    confidence: float = Field(ge=0.0, le=1.0)
+    evidence: list[str] = Field(default_factory=list)
+    recommended: RecommendedAction
+    rule_name: str | None = None
+
+
+class FailureContext(BaseModel):
+    """Compact failure context packaged for triage reporting and healing agents.
+
+    Strict privacy: contains only field_keys (names), never actual test data values,
+    card numbers, passwords, or tokens. Kept under ~6k tokens.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    goal: str
+    field_keys: list[str]
+    failed_step_index: int | None = None
+    failure_type: FailureType | None = None
+    passed_steps: list[Step] = Field(default_factory=list)
+    failed_step: Step | None = None
+    current_inventory: UIInventory | PageSnapshot | None = None
+    diff_summary: str = ""
+    evidence: dict[str, Any] = Field(default_factory=dict)
+    triage: Triage
+
+    @model_validator(mode="after")
+    def verify_privacy(self) -> "FailureContext":
+        """Verify no credit card numbers or secret tokens are leaked in field keys or text."""
+        for k in self.field_keys:
+            if _CREDIT_CARD_REGEX.search(k):
+                raise ValueError("Privacy violation: Credit card number found in field_keys")
+        if _CREDIT_CARD_REGEX.search(self.diff_summary):
+            raise ValueError("Privacy violation: Credit card number found in diff_summary")
+        return self
+
+    def estimated_tokens(self) -> int:
+        """Estimate token count based on JSON serialized character count."""
+        return max(1, len(self.model_dump_json()) // 4)
+
