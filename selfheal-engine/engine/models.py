@@ -473,3 +473,65 @@ class HealResult(BaseModel):
     is_recorded: bool = False
 
 
+# -------------------------------------------------------------
+# Module 10: Run Report Model
+# -------------------------------------------------------------
+
+class TimelineEvent(BaseModel):
+    """Chronological event in the run timeline."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    timestamp: str
+    phase: str
+    message: str
+    level: str = "info"
+    details: dict[str, Any] = Field(default_factory=dict)
+
+
+class RunReport(BaseModel):
+    """Comprehensive, self-explaining run report per Module 10 and AGENTS.md."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    run_id: str
+    timestamp: str
+    status: Status
+    headline: str
+    app_version: str
+    intent_id: str
+    intent_goal: str
+    initial_recipe_version: int
+    new_recipe_version: int | None = None
+    healed: bool = False
+    mode: str = "NONE"  # "LIVE" | "RECORDED" | "NONE"
+    provider: str = ""
+    llm_calls: int = 0
+    duration_ms: float = 0.0
+    action_count: int = 0
+    triage: Triage | None = None
+    what_broke: str = ""
+    what_changed: str = ""
+    agent_explanation: str = ""
+    verification: VerificationResult | None = None
+    timeline: list[TimelineEvent] = Field(default_factory=list)
+    initial_recipe_steps: list[dict[str, Any]] = Field(default_factory=list)
+    final_recipe_steps: list[dict[str, Any]] = Field(default_factory=list)
+    metrics: dict[str, Any] = Field(default_factory=dict)
+    artifacts: dict[str, str] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def verify_no_secrets(self) -> "RunReport":
+        """Verify strict privacy: no credit card numbers or raw tokens in report fields."""
+        fields_to_check = [
+            self.headline,
+            self.what_broke,
+            self.what_changed,
+            self.agent_explanation,
+        ]
+        for val in fields_to_check:
+            if _CREDIT_CARD_REGEX.search(val):
+                raise ValueError("Privacy violation: RunReport contains credit card number")
+        return self
+
+

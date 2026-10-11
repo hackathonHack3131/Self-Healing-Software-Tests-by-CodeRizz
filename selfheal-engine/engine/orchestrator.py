@@ -90,6 +90,7 @@ class OrchestratorResult(BaseModel):
     agent_explanation: str = ""
     events: List[OrchestratorEvent] = Field(default_factory=list)
     evidence: Dict[str, Any] = Field(default_factory=dict)
+    report_path: Optional[str] = None
 
 
 async def run_orchestrator(
@@ -145,6 +146,16 @@ async def run_orchestrator(
     emit("EXECUTE_INITIAL", f"Executing recipe v{recipe.version} against {resolved_target_url}...")
     initial_snapshot: Optional[PageSnapshot] = None
 
+    def wrap_and_report(res: OrchestratorResult, snap: Optional[PageSnapshot] = None, df: Optional[SnapshotDiff] = None, tr: Optional[List[Dict[str, Any]]] = None) -> OrchestratorResult:
+        try:
+            from engine.reporting import build_run_report, generate_run_artifacts
+            rpt = build_run_report(res, intent=intent, initial_recipe=recipe)
+            run_dir = generate_run_artifacts(report=rpt, snapshot=snap or initial_snapshot, diff=df or diff, trace=tr)
+            res.report_path = str(run_dir)
+        except Exception as exc:
+            logger.warning("Could not generate run artifacts: %s", exc)
+        return res
+
     async with BrowserSession(settings=active_settings, start_url=resolved_target_url) as session:
         initial_run_result = await run_recipe(recipe, intent, session)
         verification = await verify_outcome(page=session.page, intent=intent, monitor=session.monitor)
@@ -154,6 +165,8 @@ async def run_orchestrator(
             logger.debug("Failed to capture post-run snapshot: %s", exc)
 
     emit("EXECUTE_RESULT", f"Initial execution completed: status={initial_run_result.status.value}, verifier_passed={verification.passed}")
+
+    diff: Optional[SnapshotDiff] = None
 
     # 3. State: Direct Pass (Zero Healing Required)
     if initial_run_result.status == Status.PASS_NO_HEAL and verification.passed:
@@ -166,7 +179,7 @@ async def run_orchestrator(
             f"Deterministic verifier confirmed order #{order_id} and expected total ${total}."
         )
         emit("PASS", f"Execution passed cleanly. Zero LLM calls required.", level="info")
-        return OrchestratorResult(
+        res_pass = OrchestratorResult(
             run_id=run_id,
             intent_id=intent_id,
             target_url=resolved_target_url,
@@ -182,6 +195,7 @@ async def run_orchestrator(
             events=events,
             evidence=initial_run_result.evidence,
         )
+        return wrap_and_report(res_pass, snap=initial_snapshot)
 
     # 4. State: Step Failure or Invariant Failure -> Diff & Triage
     emit("TRIAGE", "Failure detected. Capturing UI snapshot and computing structural diff...")
@@ -219,7 +233,7 @@ async def run_orchestrator(
             f"The engine intentionally refuses to heal genuine application bugs to prevent masking defects."
         )
         emit("FAIL_BUG", f"Refusing to heal: genuine application bug detected ({triage.verdict.value})", level="warning")
-        return OrchestratorResult(
+        res_bug = OrchestratorResult(
             run_id=run_id,
             intent_id=intent_id,
             target_url=resolved_target_url,
@@ -237,6 +251,7 @@ async def run_orchestrator(
             events=events,
             evidence=initial_run_result.evidence,
         )
+        return wrap_and_report(res_bug, snap=initial_snapshot, df=diff)
 
     # 6. State: UI Drift -> Engage Deep Agent Healer (Rule 3, 5, 7, 8, 12)
     emit("HEAL_START", "UI drift confirmed. Initializing autonomous healing pipeline...")
@@ -246,18 +261,40 @@ async def run_orchestrator(
     agent_description = "Live Deep Agent"
 
     if active_agent is None:
-        if force_heal_mode == "recorded" and trace_path.exists():
+        if force_heal_mode == "live" and cfg_status != "OK":
+            duration_ms = (time.monotonic() - start_time) * 1000
+            emit("BLOCKED_CONFIG", "Missing LLM configuration for live healing mode.", level="error")
+            res_blocked = OrchestratorResult(
+                run_id=run_id,
+                intent_id=intent_id,
+                target_url=resolved_target_url,
+                status=Status.BLOCKED_CONFIG,
+                status_label="Blocked: Missing LLM Configuration (Rule 12)",
+                initial_recipe_version=old_version,
+                new_recipe_version=old_version,
+                healed=False,
+                duration_ms=round(duration_ms, 1),
+                initial_run_result=initial_run_result,
+                verification=verification,
+                triage=triage,
+                diff=diff,
+                agent_explanation="Healing blocked: GOOGLE_API_KEY is not set and live mode was requested.",
+                events=events,
+                evidence=initial_run_result.evidence,
+            )
+            return wrap_and_report(res_blocked, snap=initial_snapshot, df=diff)
+        elif force_heal_mode == "recorded" and trace_path.exists():
             active_agent = RecordedAgent(load_trace(trace_path))
             agent_description = "Recorded Healer (Deterministic Golden Trace)"
             emit("AGENT_SELECT", "Using RecordedAgent trace per explicit configuration.")
-        elif cfg_status != "OK" and trace_path.exists():
+        elif cfg_status != "OK" and trace_path.exists() and force_heal_mode != "live":
             active_agent = RecordedAgent(load_trace(trace_path))
             agent_description = "Recorded Healer (Fallback - Rule 12)"
             emit("AGENT_SELECT", "Live LLM not configured; using validated RecordedAgent fallback.")
         elif cfg_status != "OK":
             duration_ms = (time.monotonic() - start_time) * 1000
             emit("BLOCKED_CONFIG", "Missing LLM configuration and no recorded trace available.", level="error")
-            return OrchestratorResult(
+            res_blocked = OrchestratorResult(
                 run_id=run_id,
                 intent_id=intent_id,
                 target_url=resolved_target_url,
@@ -275,6 +312,7 @@ async def run_orchestrator(
                 events=events,
                 evidence=initial_run_result.evidence,
             )
+            return wrap_and_report(res_blocked, snap=initial_snapshot, df=diff)
 
     heal_result: Optional[HealResult] = None
     async with BrowserSession(settings=active_settings, start_url=resolved_target_url) as heal_session:
@@ -332,7 +370,7 @@ async def run_orchestrator(
             f"- **New Recipe**: Created `Recipe v{saved_recipe.version}` linked to parent `v{old_version}`."
         )
 
-        return OrchestratorResult(
+        res_healed = OrchestratorResult(
             run_id=run_id,
             intent_id=intent_id,
             target_url=resolved_target_url,
@@ -352,6 +390,7 @@ async def run_orchestrator(
             events=events,
             evidence=initial_run_result.evidence,
         )
+        return wrap_and_report(res_healed, snap=initial_snapshot, df=diff, tr=heal_result.trace)
 
     # 8. State: Failed Healing or Blocked Agent
     if heal_result.status == Status.FAIL_FUNCTIONAL:
@@ -369,7 +408,7 @@ async def run_orchestrator(
         f"- **Agent Details**: {heal_result.explanation or 'No working path found'}\n"
     )
 
-    return OrchestratorResult(
+    res_failed = OrchestratorResult(
         run_id=run_id,
         intent_id=intent_id,
         target_url=resolved_target_url,
@@ -389,3 +428,4 @@ async def run_orchestrator(
         events=events,
         evidence=initial_run_result.evidence,
     )
+    return wrap_and_report(res_failed, snap=initial_snapshot, df=diff, tr=heal_result.trace if heal_result else None)

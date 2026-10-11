@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SelfHeal Run Report — {{ report.run_id }}</title>
+  <style>
+    :root {
+      --bg: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --primary: #2563EB;
+      --pass: #16A34A;
+      --pass-bg: #DCFCE7;
+      --fail: #DC2626;
+      --fail-bg: #FEE2E2;
+      --blocked: #D97706;
+      --blocked-bg: #FEF3C7;
+      --neutral: #475569;
+      --neutral-bg: #F1F5F9;
+      --agent-bg: #F8FAFC;
+      --agent-border: #CBD5E1;
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      line-height: 1.5;
+      padding: 32px 16px;
+    }
+    .report-container {
+      max-width: 1040px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .header-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .top-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .brand-title span { color: var(--primary); }
+    .badges-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .badge-pass { background: var(--pass-bg); color: var(--pass); border: 1px solid rgba(22, 163, 74, 0.2); }
+    .badge-fail { background: var(--fail-bg); color: var(--fail); border: 1px solid rgba(220, 38, 38, 0.2); }
+    .badge-blocked { background: var(--blocked-bg); color: var(--blocked); border: 1px solid rgba(217, 119, 6, 0.2); }
+    .badge-neutral { background: var(--neutral-bg); color: var(--neutral); border: 1px solid var(--border); }
+    .badge-mode {
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border: 1px solid #BFDBFE;
+      font-family: var(--font-mono);
+    }
+    .headline-banner {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px 24px;
+      background: #F8FAFC;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-label { color: var(--text-muted); font-size: 11px; text-transform: uppercase; font-weight: 600; }
+    .meta-value { font-weight: 600; color: var(--text); }
+    .meta-mono { font-family: var(--font-mono); font-size: 12px; }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title-tag {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #F1F5F9;
+      color: var(--text-muted);
+    }
+
+    /* Diagnosis Section (What Broke vs What Changed) */
+    .diagnosis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 768px) {
+      .diagnosis-grid { grid-template-columns: 1fr; }
+    }
+    .diag-box {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      background: #F8FAFC;
+    }
+    .diag-box-header {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+    }
+    .diag-box-content { font-size: 14px; color: var(--text); }
+
+    /* Model Explanation Box */
+    .agent-box {
+      border: 1px dashed var(--agent-border);
+      background: var(--agent-bg);
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .agent-box-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94A3B8;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .agent-text {
+      font-size: 14px;
+      color: #334155;
+      white-space: pre-wrap;
+      font-family: var(--font-main);
+      line-height: 1.6;
+    }
+
+    /* Verification Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    th {
+      background: #F8FAFC;
+      text-align: left;
+      padding: 10px 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #F1F5F9;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    .status-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .status-pass { background: #DCFCE7; color: #15803D; }
+    .status-fail { background: #FEE2E2; color: #B91C1C; }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      margin-left: 12px;
+      padding-left: 20px;
+      border-left: 2px solid #E2E8F0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .timeline-item { position: relative; }
+    .timeline-dot {
+      position: absolute;
+      left: -27px;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 2px solid #94A3B8;
+    }
+    .dot-pass { border-color: var(--pass); background: var(--pass); }
+    .dot-fail { border-color: var(--fail); background: var(--fail); }
+    .dot-heal { border-color: var(--primary); background: var(--primary); }
+    .timeline-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .timeline-phase {
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text);
+    }
+    .timeline-time {
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+    .timeline-msg { font-size: 13px; color: #334155; }
+
+    /* Recipe Diff */
+    .recipe-diff-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 768px) {
+      .recipe-diff-grid { grid-template-columns: 1fr; }
+    }
+    .recipe-diff-col {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .recipe-diff-title {
+      background: #F8FAFC;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .step-list {
+      list-style: none;
+      padding: 8px 0;
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+    .step-item {
+      padding: 6px 14px;
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid #F8FAFC;
+    }
+    .step-num { color: var(--text-muted); min-width: 20px; }
+    .step-act { font-weight: 600; color: var(--primary); }
+
+    /* Metrics Grid */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 640px) {
+      .metrics-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    .metric-card {
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+    .metric-val {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      font-family: var(--font-mono);
+    }
+    .metric-lbl {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* Footer Privacy Notice */
+    .privacy-notice {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="report-container">
+
+    <!-- Header Card -->
+    <header class="header-card">
+      <div class="top-meta-row">
+        <div class="brand-title">SelfHeal <span>Report</span></div>
+        <div class="badges-group">
+          {% if "PASS" in report.status.value %}
+            <span class="badge badge-pass">{{ report.status.value }}</span>
+          {% elif "FAIL" in report.status.value %}
+            <span class="badge badge-fail">{{ report.status.value }}</span>
+          {% elif "BLOCKED" in report.status.value %}
+            <span class="badge badge-blocked">{{ report.status.value }}</span>
+          {% else %}
+            <span class="badge badge-neutral">{{ report.status.value }}</span>
+          {% endif %}
+          <span class="badge badge-mode">MODE: {{ report.mode }}</span>
+          <span class="badge badge-neutral">VERSION: {{ report.app_version | upper }}</span>
+        </div>
+      </div>
+
+      <div class="headline-banner">{{ report.headline }}</div>
+
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Run ID</span>
+          <span class="meta-value meta-mono">{{ report.run_id }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Immutable Intent</span>
+          <span class="meta-value">{{ report.intent_id }} &bull; "{{ report.intent_goal }}"</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Recipe Version</span>
+          <span class="meta-value">
+            v{{ report.initial_recipe_version }}
+            {% if report.new_recipe_version and report.new_recipe_version != report.initial_recipe_version %}
+              &rarr; <strong>v{{ report.new_recipe_version }}</strong> (Autonomous Rebuild)
+            {% else %}
+              (Unmodified)
+            {% endif %}
+          </span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Timestamp</span>
+          <span class="meta-value meta-mono">{{ report.timestamp }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Metrics Row -->
+    <section class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-val">{{ report.duration_ms }} ms</div>
+        <div class="metric-lbl">Execution Duration</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">{{ report.llm_calls }}</div>
+        <div class="metric-lbl">LLM Calls ({{ report.provider or 'None' }})</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">{{ report.action_count }}</div>
+        <div class="metric-lbl">Healed Actions Executed</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">
+          {% if report.triage %}
+            {{ (report.triage.confidence * 100) | round | int }}%
+          {% else %}
+            100%
+          {% endif %}
+        </div>
+        <div class="metric-lbl">Triage Confidence</div>
+      </div>
+    </section>
+
+    <!-- Diagnosis: What Broke vs What Changed -->
+    <section class="card">
+      <div class="card-title">
+        <span>Observed Evidence Diagnosis</span>
+        <span class="card-title-tag">Deterministic Findings</span>
+      </div>
+      <div class="diagnosis-grid">
+        <div class="diag-box">
+          <div class="diag-box-header">What Broke</div>
+          <div class="diag-box-content">{{ report.what_broke or 'No step execution errors observed.' }}</div>
+        </div>
+        <div class="diag-box">
+          <div class="diag-box-header">What Changed</div>
+          <div class="diag-box-content">{{ report.what_changed or 'No structural UI changes detected.' }}</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Agent Explanation (Visibly Separate & Labeled) -->
+    {% if report.agent_explanation %}
+    <section class="card">
+      <div class="card-title">
+        <span>Agent Explanation</span>
+        <span class="card-title-tag">AI Generated &bull; Untrusted Text</span>
+      </div>
+      <div class="agent-box">
+        <span class="agent-box-label">Note: The following explanation is model-generated rationale. Deterministic verification alone establishes pass/fail.</span>
+        <div class="agent-text">{{ report.agent_explanation }}</div>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Deterministic Verification Checks -->
+    {% if report.verification and report.verification.checks %}
+    <section class="card">
+      <div class="card-title">
+        <span>Deterministic Invariants & Outcome Verification</span>
+        <span class="card-title-tag">Pass/Fail Ground Truth</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Check Name</th>
+            <th>Specification & Invariant Detail</th>
+            <th>Observed Evidence</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for check in report.verification.checks %}
+          <tr>
+            <td><strong>{{ check.name }}</strong></td>
+            <td>{{ check.detail }}</td>
+            <td class="meta-mono">{{ check.evidence if check.evidence is not none else 'None' }}</td>
+            <td>
+              {% if check.passed %}
+                <span class="status-pill status-pass">PASSED</span>
+              {% else %}
+                <span class="status-pill status-fail">FAILED</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    {% endif %}
+
+    <!-- Side-by-Side Recipe Comparison -->
+    {% if report.final_recipe_steps %}
+    <section class="card">
+      <div class="card-title">
+        <span>Side-by-Side Recipe Diff</span>
+        <span class="card-title-tag">Version {{ report.initial_recipe_version }} vs Version {{ report.new_recipe_version or report.initial_recipe_version }}</span>
+      </div>
+      <div class="recipe-diff-grid">
+        <div class="recipe-diff-col">
+          <div class="recipe-diff-title">Initial Recipe (v{{ report.initial_recipe_version }}) &bull; {{ report.initial_recipe_steps | length }} steps</div>
+          <ul class="step-list">
+            {% for s in report.initial_recipe_steps %}
+            <li class="step-item">
+              <span class="step-num">{{ loop.index0 }}.</span>
+              <span class="step-act">{{ s.action }}</span>
+              <span>{{ s.target_name or s.field_key or '' }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="recipe-diff-col">
+          <div class="recipe-diff-title">Final Verified Recipe (v{{ report.new_recipe_version or report.initial_recipe_version }}) &bull; {{ report.final_recipe_steps | length }} steps</div>
+          <ul class="step-list">
+            {% for s in report.final_recipe_steps %}
+            <li class="step-item">
+              <span class="step-num">{{ loop.index0 }}.</span>
+              <span class="step-act">{{ s.action }}</span>
+              <span>{{ s.target_name or s.field_key or '' }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Chronological Timeline -->
+    {% if report.timeline %}
+    <section class="card">
+      <div class="card-title">
+        <span>Chronological Run Timeline</span>
+        <span class="card-title-tag">{{ report.timeline | length }} Events Logged</span>
+      </div>
+      <div class="timeline">
+        {% for event in report.timeline %}
+        <div class="timeline-item">
+          {% if event.level == 'error' or 'FAIL' in event.phase %}
+            <span class="timeline-dot dot-fail"></span>
+          {% elif event.phase in ['PASS', 'RECIPE_SAVED'] %}
+            <span class="timeline-dot dot-pass"></span>
+          {% elif 'HEAL' in event.phase or event.phase == 'DIFF' %}
+            <span class="timeline-dot dot-heal"></span>
+          {% else %}
+            <span class="timeline-dot"></span>
+          {% endif %}
+          <div class="timeline-header">
+            <span class="timeline-phase">{{ event.phase }}</span>
+            <span class="timeline-time">{{ event.timestamp }}</span>
+          </div>
+          <div class="timeline-msg">{{ event.message }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Privacy Notice -->
+    <div class="privacy-notice">
+      Rule 10 & 13 Compliance: Zero credit card numbers, passwords, tokens, or raw secrets are recorded or logged. All card numbers are strictly masked.
+    </div>
+
+  </div>
+</body>
+</html>

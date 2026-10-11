@@ -278,11 +278,18 @@ async def heal_recipe(
         agent_override=agent_override,
     )
 
+    is_rec = False
+    if agent_override is not None:
+        from engine.agent.recorded import RecordedAgent
+        if isinstance(agent_override, RecordedAgent) or getattr(agent_override, "__class__", None).__name__ == "RecordedAgent":
+            is_rec = True
+
     if outcome.status == "BLOCKED_CONFIG":
         return HealResult(
             status=Status.BLOCKED_CONFIG,
             explanation=outcome.report,
             trace=outcome.trace,
+            is_recorded=is_rec,
         )
 
     if outcome.status == "BLOCKED_AGENT":
@@ -291,6 +298,7 @@ async def heal_recipe(
             executed_steps=outcome.executed_new_steps,
             explanation=outcome.report,
             trace=outcome.trace,
+            is_recorded=is_rec,
         )
 
     if outcome.status != "OK" or not outcome.executed_new_steps:
@@ -299,6 +307,7 @@ async def heal_recipe(
             executed_steps=outcome.executed_new_steps,
             explanation=outcome.report or "Agent completed without proposing any approved steps.",
             trace=outcome.trace,
+            is_recorded=is_rec,
         )
 
     # Reconstruct candidate Recipe
@@ -325,6 +334,7 @@ async def heal_recipe(
             explanation=f"Clean replay failed at step {clean_run_res.failed_step_index}: {err_msg}",
             trace=outcome.trace,
             clean_replay_result=clean_run_res,
+            is_recorded=is_rec,
         )
 
     ver_res = await verify_outcome(session.page, intent, session.monitor)
@@ -339,6 +349,7 @@ async def heal_recipe(
             explanation=f"Clean replay failed verifier checks: {failed_checks}",
             trace=outcome.trace,
             clean_replay_result=clean_run_res,
+            is_recorded=is_rec,
         )
 
     return HealResult(
@@ -348,4 +359,5 @@ async def heal_recipe(
         explanation=outcome.report or "Healed recipe verified on clean replay.",
         trace=outcome.trace,
         clean_replay_result=clean_run_res,
+        is_recorded=is_rec,
     )
