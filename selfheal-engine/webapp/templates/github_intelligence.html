@@ -331,11 +331,11 @@
           </div>
           <div class="card" style="padding: 16px;">
             <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Additions</div>
-            <div id="statAdditions" style="font-size: 24px; font-weight: 700; color: var(--mono-black); margin-top: 4px;">+0</div>
+            <div id="statAdditions" style="font-size: 24px; font-weight: 700; color: var(--mono-black); margin-top: 4px;">0</div>
           </div>
           <div class="card" style="padding: 16px;">
             <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Deletions</div>
-            <div id="statDeletions" style="font-size: 24px; font-weight: 700; color: var(--mono-gray); text-decoration: line-through; margin-top: 4px;">-0</div>
+            <div id="statDeletions" style="font-size: 24px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">0</div>
           </div>
           <div class="card" style="padding: 16px;">
             <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Risk Findings</div>
@@ -542,8 +542,8 @@
 
       // Metrics
       document.getElementById('statFiles').textContent = r.total_files_changed;
-      document.getElementById('statAdditions').textContent = `+${r.total_additions}`;
-      document.getElementById('statDeletions').textContent = `-${r.total_deletions}`;
+      document.getElementById('statAdditions').textContent = r.total_additions > 0 ? `+${r.total_additions}` : '0';
+      document.getElementById('statDeletions').textContent = r.total_deletions > 0 ? `-${r.total_deletions}` : '0';
       document.getElementById('statFindings').textContent = (r.findings || []).length;
       document.getElementById('statDuration').textContent = `${r.duration_ms} ms`;
 

@@ -193,11 +193,11 @@
       </div>
       <div class="stat-card">
         <div class="stat-lbl">Additions</div>
-        <div class="stat-val add-cnt">+{{ report.total_additions }}</div>
+        <div class="stat-val add-cnt">{% if report.total_additions > 0 %}+{{ report.total_additions }}{% else %}0{% endif %}</div>
       </div>
       <div class="stat-card">
         <div class="stat-lbl">Deletions</div>
-        <div class="stat-val del-cnt">-{{ report.total_deletions }}</div>
+        <div class="stat-val del-cnt">{% if report.total_deletions > 0 %}-{{ report.total_deletions }}{% else %}0{% endif %}</div>
       </div>
       <div class="stat-card">
         <div class="stat-lbl">Risk Findings</div>
