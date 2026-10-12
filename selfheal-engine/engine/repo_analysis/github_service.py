@@ -161,11 +161,13 @@ def run_git_command(
             env=safe_env,
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=timeout,
             shell=False,
         )
         if check and result.returncode != 0:
-            err = result.stderr.strip() or result.stdout.strip() or f"exited with code {result.returncode}"
+            err = (result.stderr or "").strip() or (result.stdout or "").strip() or f"exited with code {result.returncode}"
             raise GitExecutionError(f"Git command {' '.join(cmd[:3])} failed: {err}")
         return result
     except subprocess.TimeoutExpired as exc:

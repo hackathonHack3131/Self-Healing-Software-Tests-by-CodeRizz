@@ -122,7 +122,7 @@ def parse_raw_diff(
     numstat_res = run_git_command(["diff", "-M", "--numstat", base_sha, head_sha], cwd=repo_dir)
     file_stats: Dict[str, Tuple[int, int, bool]] = {}
 
-    for line in numstat_res.stdout.splitlines():
+    for line in (numstat_res.stdout or "").splitlines():
         line = line.strip()
         if not line:
             continue
@@ -139,7 +139,7 @@ def parse_raw_diff(
     status_res = run_git_command(["diff", "-M", "--name-status", base_sha, head_sha], cwd=repo_dir)
     file_statuses: Dict[str, Tuple[str, Optional[str]]] = {}
 
-    for line in status_res.stdout.splitlines():
+    for line in (status_res.stdout or "").splitlines():
         line = line.strip()
         if not line:
             continue
@@ -160,7 +160,7 @@ def parse_raw_diff(
 
     # 3. Query actual patch
     patch_res = run_git_command(["diff", "-M", "--patch", "-U3", base_sha, head_sha], cwd=repo_dir)
-    raw_patches = patch_res.stdout
+    raw_patches = patch_res.stdout or ""
 
     # Split patch by file diff headers
     diff_hunks_by_file: Dict[str, str] = {}
