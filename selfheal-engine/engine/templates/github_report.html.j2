@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Change Intelligence Report — {{ report.job_id }}</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #8b5cf6;
+      --code-bg: #030712;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      padding: 2rem 1.5rem;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.75rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    .header-brand h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .header-meta {
+      margin-top: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-completed { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-ai { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-det { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
+    .badge-critical { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-high { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-med { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-low { background: rgba(156, 163, 175, 0.15); color: #d1d5db; border: 1px solid rgba(156, 163, 175, 0.3); }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+    .stat-val { font-size: 1.75rem; font-weight: 700; margin-top: 0.25rem; }
+    .stat-lbl { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+    }
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .commit-box {
+      background: var(--code-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+    .finding-item {
+      background: rgba(17, 24, 39, 0.7);
+      border: 1px solid var(--card-border);
+      border-left: 4px solid var(--primary);
+      border-radius: 6px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .finding-critical { border-left-color: var(--danger); }
+    .finding-high { border-left-color: var(--warning); }
+    .finding-medium { border-left-color: var(--primary); }
+    .finding-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .finding-title { font-weight: 600; font-size: 1rem; }
+    .diff-box {
+      background: var(--code-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      margin-top: 0.5rem;
+      color: #e5e7eb;
+    }
+    .file-item {
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+    }
+    .file-header {
+      background: rgba(31, 41, 55, 0.5);
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+    .add-cnt { color: #34d399; }
+    .del-cnt { color: #f87171; }
+    .untrusted-banner {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 6px;
+      padding: 1rem;
+      font-size: 0.85rem;
+      color: #93c5fd;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-brand">
+        <h1>SelfHeal Change Intelligence</h1>
+        <div class="header-meta">
+          <div>Repository: <strong>{{ report.repo_url }}</strong></div>
+          <div>Job ID: <code>{{ report.job_id }}</code> &bull; Generated: {{ report.created_at }}</div>
+        </div>
+      </div>
+      <div>
+        <span class="badge badge-completed">{{ report.status }}</span>
+        {% if report.mode == "AI_ASSISTED" %}
+          <span class="badge badge-ai">AI-ASSISTED</span>
+        {% else %}
+          <span class="badge badge-det">DETERMINISTIC</span>
+        {% endif %}
+      </div>
+    </header>
+
+    <!-- Metrics Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-lbl">Files Changed</div>
+        <div class="stat-val">{{ report.total_files_changed }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Additions</div>
+        <div class="stat-val add-cnt">+{{ report.total_additions }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Deletions</div>
+        <div class="stat-val del-cnt">-{{ report.total_deletions }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Risk Findings</div>
+        <div class="stat-val" style="color: {% if report.findings %}#fbbf24{% else %}#34d399{% endif %};">
+          {{ report.findings|length }}
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl">Analysis Time</div>
+        <div class="stat-val">{{ report.duration_ms|round(1) }} ms</div>
+      </div>
+    </div>
+
+    <!-- Commits Comparison -->
+    <div class="card">
+      <div class="card-title">Commit Comparison</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">BASE COMMIT</h4>
+          <div class="commit-box">
+            {% if report.base_commit %}
+              <div><strong>SHA:</strong> {{ report.base_commit.short_sha }} ({{ report.base_commit.sha }})</div>
+              <div><strong>Author:</strong> {{ report.base_commit.author_name }} &lt;{{ report.base_commit.author_email }}&gt;</div>
+              <div><strong>Date:</strong> {{ report.base_commit.date }}</div>
+              <div style="margin-top: 0.5rem; color: #93c5fd;">{{ report.base_commit.message }}</div>
+            {% else %}
+              <em>Initial repository state</em>
+            {% endif %}
+          </div>
+        </div>
+        <div>
+          <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">TARGET (HEAD) COMMIT</h4>
+          <div class="commit-box">
+            {% if report.head_commit %}
+              <div><strong>SHA:</strong> {{ report.head_commit.short_sha }} ({{ report.head_commit.sha }})</div>
+              <div><strong>Author:</strong> {{ report.head_commit.author_name }} &lt;{{ report.head_commit.author_email }}&gt;</div>
+              <div><strong>Date:</strong> {{ report.head_commit.date }}</div>
+              <div style="margin-top: 0.5rem; color: #93c5fd;">{{ report.head_commit.message }}</div>
+            {% else %}
+              <em>No head commit metadata</em>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Explanation Section -->
+    <div class="card">
+      <div class="card-title">
+        <span>Executive Analysis & AI Explanation</span>
+        <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">
+          {% if report.mode == "AI_ASSISTED" %}Provider: Google Gemini{% else %}Deterministic Engine{% endif %}
+        </span>
+      </div>
+      <div class="untrusted-banner">
+        <strong>Security Notice:</strong> Repository contents, commit messages, and diffs are untrusted data. AI synthesis provides advisory analysis and does not execute arbitrary code or replace deterministic verification.
+      </div>
+      <div style="line-height: 1.7; white-space: pre-wrap; font-size: 0.95rem;">
+        {{ report.ai_explanation }}
+      </div>
+    </div>
+
+    <!-- Grounded Risk Findings -->
+    <div class="card">
+      <div class="card-title">
+        <span>Grounded Risk Findings ({{ report.findings|length }})</span>
+      </div>
+      {% if report.findings %}
+        {% for f in report.findings %}
+          <div class="finding-item {% if f.severity == 'CRITICAL' %}finding-critical{% elif f.severity == 'HIGH' %}finding-high{% else %}finding-medium{% endif %}">
+            <div class="finding-header">
+              <div class="finding-title">
+                <code>{{ f.id }}</code> &mdash; {{ f.what_changed }}
+              </div>
+              <div>
+                <span class="badge {% if f.severity == 'CRITICAL' %}badge-critical{% elif f.severity == 'HIGH' %}badge-high{% elif f.severity == 'MEDIUM' %}badge-med{% else %}badge-low{% endif %}">
+                  {{ f.severity }}
+                </span>
+                <span class="badge badge-det">{{ f.confidence }} CONFIDENCE</span>
+              </div>
+            </div>
+            <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">
+              <strong>File:</strong> <code>{{ f.file_path }}</code> ({{ f.line_range }})
+            </div>
+            <div style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #e5e7eb;">
+              <strong>Why it matters:</strong> {{ f.why_it_matters }}
+            </div>
+            <div style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #fca5a5;">
+              <strong>Potential Impact:</strong> {{ f.potential_impact }}
+            </div>
+            <div style="font-size: 0.9rem; color: #86efac;">
+              <strong>Recommended Follow-up:</strong> {{ f.recommended_followup }}
+            </div>
+            {% if f.diff_hunk %}
+              <div class="diff-box">{{ f.diff_hunk }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="color: var(--text-muted); font-size: 0.95rem;">No critical regressions, removed validations, or breaking locator drifts detected in this diff.</p>
+      {% endif %}
+    </div>
+
+    <!-- Changed Files & Diffs -->
+    <div class="card">
+      <div class="card-title">Changed Files ({{ report.files|length }})</div>
+      {% for file in report.files %}
+        <div class="file-item">
+          <div class="file-header">
+            <div>
+              <span class="badge badge-low">{{ file.status|upper }}</span>
+              <span class="badge badge-det">{{ file.category|upper }}</span>
+              <strong style="margin-left: 0.5rem;">{{ file.path }}</strong>
+              {% if file.old_path %}
+                <span style="color: var(--text-muted);">&larr; renamed from {{ file.old_path }}</span>
+              {% endif %}
+            </div>
+            <div>
+              <span class="add-cnt">+{{ file.additions }}</span> / <span class="del-cnt">-{{ file.deletions }}</span>
+            </div>
+          </div>
+          {% if file.patch %}
+            <div class="diff-box">{{ file.patch }}</div>
+          {% elif file.is_binary %}
+            <div style="padding: 0.75rem; color: var(--text-muted); font-size: 0.85rem;">[Binary file changed]</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 2rem;">
+      SelfHeal Autonomous E2E Testing Engine &bull; GitHub Change Intelligence &bull; Full card numbers and credentials strictly redacted.
+    </footer>
+  </div>
+</body>
+</html>

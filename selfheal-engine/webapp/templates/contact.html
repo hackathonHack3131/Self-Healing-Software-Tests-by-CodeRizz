@@ -8,6 +8,86 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    /* Scoped FAQ Accessible Accordion Styling */
+    .faq-accordion-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .faq-accordion-item {
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      overflow: hidden;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .faq-accordion-item:hover {
+      border-color: var(--border-hover);
+    }
+    .faq-accordion-item.open {
+      border-color: var(--brand-accent);
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08);
+    }
+    .faq-accordion-btn {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .faq-accordion-btn:hover {
+      background-color: var(--bg-subtle);
+    }
+    .faq-accordion-btn:focus-visible {
+      outline: 2px solid var(--brand-accent);
+      outline-offset: -2px;
+    }
+    .faq-accordion-item.open .faq-accordion-btn {
+      color: var(--brand-accent);
+    }
+    .faq-chevron {
+      flex-shrink: 0;
+      color: var(--text-muted);
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .faq-accordion-btn[aria-expanded="true"] .faq-chevron {
+      transform: rotate(180deg);
+      color: var(--brand-accent);
+    }
+    .faq-panel {
+      display: block;
+    }
+    .faq-panel[hidden] {
+      display: none;
+    }
+    .faq-panel-inner {
+      padding: 12px 16px 16px 16px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-page);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .faq-chevron {
+        transition: none !important;
+      }
+      .faq-accordion-item {
+        transition: none !important;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="app-container">
@@ -31,7 +111,7 @@
       <nav class="nav-links">
         <a href="/" class="nav-link">Home</a>
         <a href="/demo" class="nav-link">Interactive Demo</a>
-        <a href="/about" class="nav-link">Architecture & About</a>
+        <a href="/github-intelligence" class="nav-link">GitHub Intelligence</a>
         <a href="/contact" class="nav-link active">Contact Us</a>
       </nav>
 
@@ -113,69 +193,74 @@
           </div>
         </div>
 
-        <!-- Right: Team Information & FAQ -->
+        <!-- Right: FAQ -->
         <div class="contact-side-col">
-          <!-- Team Card -->
-          <div class="glass-panel team-info-card">
-            <div class="panel-header">
-              <div class="panel-title">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-                Engineering Team
-              </div>
-            </div>
-            <div class="team-body">
-              <div class="team-meta-row">
-                <span class="meta-label">Team:</span>
-                <span class="meta-val"><strong>CodeRizz</strong></span>
-              </div>
-              <div class="team-meta-row">
-                <span class="meta-label">Hackathon Track:</span>
-                <span class="meta-val">Problem Statement 1 (Software Engineering)</span>
-              </div>
-              <div class="team-meta-row">
-                <span class="meta-label">Project:</span>
-                <span class="meta-val">Self-Healing Software Tests (SelfHeal Engine)</span>
-              </div>
-              <div class="team-meta-row">
-                <span class="meta-label">Local Environment:</span>
-                <span class="meta-val">MongoDB (localhost:27017) &bull; Flask (:8080) &bull; Demo (:5000)</span>
-              </div>
-            </div>
-          </div>
-
           <!-- FAQ Accordion -->
           <div class="glass-panel faq-card">
             <div class="panel-header">
-              <div class="panel-title">Frequently Asked Questions</div>
+              <div class="panel-title">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                Frequently Asked Questions
+              </div>
             </div>
-            <div class="faq-list">
-              <div class="faq-item">
-                <div class="faq-q">How does SelfHeal avoid masking real bugs?</div>
-                <div class="faq-a">
-                  Deterministic triage executes before any LLM is called. If HTTP &ge; 500 or error alerts occur, triage immediately tags <strong>APP_BUG</strong> and halts with <code class="code-inline">FAIL_FUNCTIONAL</code>, refusing to engage the healing agent.
+            <div class="faq-accordion-list" id="faqAccordion">
+              <div class="faq-accordion-item">
+                <button type="button" class="faq-accordion-btn" id="faq-btn-1" aria-expanded="true" aria-controls="faq-panel-1">
+                  <span class="faq-q-text">How does SelfHeal avoid masking real bugs?</span>
+                  <svg class="faq-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="faq-panel" id="faq-panel-1" role="region" aria-labelledby="faq-btn-1">
+                  <div class="faq-panel-inner">
+                    Deterministic triage executes before any LLM is called. If HTTP &ge; 500 or error alerts occur, triage immediately tags <strong>APP_BUG</strong> and halts with <code class="code-inline">FAIL_FUNCTIONAL</code>, refusing to engage the healing agent.
+                  </div>
                 </div>
               </div>
 
-              <div class="faq-item">
-                <div class="faq-q">Does the agent have access to live credentials?</div>
-                <div class="faq-a">
-                  No. Recipe steps reference <code class="code-inline">field_key</code> identifiers only. Raw values are injected strictly by deterministic test runners from the immutable intent test data.
+              <div class="faq-accordion-item">
+                <button type="button" class="faq-accordion-btn" id="faq-btn-2" aria-expanded="false" aria-controls="faq-panel-2">
+                  <span class="faq-q-text">Does the agent have access to live credentials?</span>
+                  <svg class="faq-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="faq-panel" id="faq-panel-2" role="region" aria-labelledby="faq-btn-2" hidden>
+                  <div class="faq-panel-inner">
+                    No. Recipe steps reference <code class="code-inline">field_key</code> identifiers only. Raw values are injected strictly by deterministic test runners from the immutable intent test data.
+                  </div>
                 </div>
               </div>
 
-              <div class="faq-item">
-                <div class="faq-q">What happens if Gemini API hits daily rate limits?</div>
-                <div class="faq-a">
-                  Per <strong>Rule 12</strong>, the system never fakes AI. When quota 429 occurs, it falls back to a verified golden trace, transparently labeled <code class="code-inline">RECORDED</code>, which still undergoes full validator and clean replay checks.
+              <div class="faq-accordion-item">
+                <button type="button" class="faq-accordion-btn" id="faq-btn-3" aria-expanded="false" aria-controls="faq-panel-3">
+                  <span class="faq-q-text">What happens if Gemini API hits daily rate limits?</span>
+                  <svg class="faq-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="faq-panel" id="faq-panel-3" role="region" aria-labelledby="faq-btn-3" hidden>
+                  <div class="faq-panel-inner">
+                    Per <strong>Rule 12</strong>, the system never fakes AI. When quota 429 occurs, it falls back to a verified golden trace, transparently labeled <code class="code-inline">RECORDED</code>, which still undergoes full validator and clean replay checks.
+                  </div>
                 </div>
               </div>
 
-              <div class="faq-item">
-                <div class="faq-q">How is MongoDB used in this project?</div>
-                <div class="faq-a">
-                  MongoDB permanently archives all test runs, execution timelines, AOM diffs, triage decisions, contact submissions, and versioned recipes (<code class="code-inline">v1</code>, <code class="code-inline">v2</code>) with cryptographic intent hashes.
+              <div class="faq-accordion-item">
+                <button type="button" class="faq-accordion-btn" id="faq-btn-4" aria-expanded="false" aria-controls="faq-panel-4">
+                  <span class="faq-q-text">How is MongoDB used in this project?</span>
+                  <svg class="faq-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="faq-panel" id="faq-panel-4" role="region" aria-labelledby="faq-btn-4" hidden>
+                  <div class="faq-panel-inner">
+                    MongoDB permanently archives all test runs, execution timelines, AOM diffs, triage decisions, contact submissions, and versioned recipes (<code class="code-inline">v1</code>, <code class="code-inline">v2</code>) with cryptographic intent hashes.
+                  </div>
                 </div>
               </div>
             </div>
@@ -192,10 +277,6 @@
           <p class="footer-desc">
             Intent-aware, autonomous end-to-end testing system that survives interface redesigns without modifying test contracts.
           </p>
-          <div class="footer-status-pill">
-            <span class="status-dot dot-live"></span>
-            <span>Local MongoDB: Connected (localhost:27017)</span>
-          </div>
         </div>
 
         <div class="footer-col">
@@ -203,7 +284,6 @@
           <ul class="footer-links">
             <li><a href="/">Home</a></li>
             <li><a href="/demo">Interactive Studio Demo</a></li>
-            <li><a href="/about">Architecture & Global Rules</a></li>
             <li><a href="/contact">Contact & Feedback</a></li>
           </ul>
         </div>
@@ -291,6 +371,29 @@
         btnText.textContent = 'Submit to MongoDB \u2192';
       }
     }
+
+    // Accessible FAQ Accordion Interaction
+    document.addEventListener('DOMContentLoaded', () => {
+      const accordionButtons = document.querySelectorAll('.faq-accordion-btn');
+      accordionButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+          const targetId = btn.getAttribute('aria-controls');
+          const panel = document.getElementById(targetId);
+          const item = btn.closest('.faq-accordion-item');
+
+          if (isExpanded) {
+            btn.setAttribute('aria-expanded', 'false');
+            if (panel) panel.hidden = true;
+            if (item) item.classList.remove('open');
+          } else {
+            btn.setAttribute('aria-expanded', 'true');
+            if (panel) panel.hidden = false;
+            if (item) item.classList.add('open');
+          }
+        });
+      });
+    });
   </script>
 </body>
 </html>

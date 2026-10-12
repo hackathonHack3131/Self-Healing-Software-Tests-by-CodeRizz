@@ -248,4 +248,121 @@ Run the complete test suite across all modules:
 ```powershell
 pytest -q
 ```
-Expected result: **137 passed**.
+Expected result: **155 passed** (137 core SelfHeal engine tests + 18 GitHub Change Intelligence tests).
+
+---
+
+## GitHub Change Intelligence
+
+**GitHub Change Intelligence** performs grounded commit diff analysis between any two commits, branches, or tags in a GitHub repository. It predicts UI locator drift, calculation modifications, broken endpoints, and deleted test coverage before running end-to-end test suites.
+
+### Architecture & Data Flow
+
+```
+                      +---------------------------------------+
+                      | User / CLI / Webhook Input            |
+                      | (Repo URL, Base Ref, Head Ref)        |
+                      +-------------------+-------------------+
+                                          |
+                                          v
+                      +---------------------------------------+
+                      | Security & SSRF Validation            |
+                      | (HTTPS only, github.com, sanitize)    |
+                      +-------------------+-------------------+
+                                          |
+                                          v
+                      +---------------------------------------+
+                      | Isolated Git Sandbox                  |
+                      | (Temporary bare/shallow clone, no     |
+                      | shell=True, disabled hooks, timeout)  |
+                      +-------------------+-------------------+
+                                          |
+                                          v
+                      +---------------------------------------+
+                      | Grounded Diff & AST Analysis          |
+                      | - UI/UX locators & form changes       |
+                      | - Business logic & calculations       |
+                      | - Backend API routes & models         |
+                      | - Test additions & deletions          |
+                      | - Dependencies & configuration        |
+                      +-------------------+-------------------+
+                                          |
+                        +-----------------+-----------------+
+                        |                                   |
+                LLM Configured                      LLM Not Configured /
+                (Google Gemini)                     Rate Limit Exhausted
+                        |                                   |
+                        v                                   v
+             [AI-Assisted Synthesis]             [Deterministic Fallback]
+             (Untrusted input guarded)           (100% verified facts)
+                        |                                   |
+                        +-----------------+-----------------+
+                                          |
+                                          v
+                      +---------------------------------------+
+                      | Standalone Audit Bundle               |
+                      | runs/github_analysis/<job_id>/        |
+                      | - report.html (interactive UI)        |
+                      | - report.json (Pydantic schema)       |
+                      | - report.md   (Markdown summary)      |
+                      +---------------------------------------+
+```
+
+### Exact Startup & Analysis Commands (PowerShell)
+
+#### 1. Interactive Web Dashboard
+Start the web dashboard and navigate to the GitHub Intelligence studio:
+```powershell
+# Start web dashboard on port 8080
+python cli.py serve --dashboard
+
+# Open browser to:
+# http://127.0.0.1:8080/github-intelligence
+```
+
+#### 2. Command-Line Interface (CLI)
+Analyze any public repository directly from PowerShell:
+```powershell
+# Compare specific release tags
+python cli.py analyze --repo https://github.com/pallets/flask --base 3.1.2 --head 3.1.3
+
+# Compare latest commit with its parent
+python cli.py analyze --repo https://github.com/psf/requests
+```
+
+#### 3. Real Git Commit Demonstration Script
+Run the automated end-to-end demonstration on a real 2-commit repository fixture:
+```powershell
+python scripts/demo_github_analysis.py
+```
+
+### REST API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/github-analysis` | Submit repository comparison job (`repo_url`, `base_ref`, `head_ref`). Returns `202 Accepted` with `job_id`. |
+| `GET` | `/api/github-analysis/<job_id>` | Poll job progress and status (`QUEUED`, `RUNNING`, `COMPLETED`, `FAILED`). |
+| `GET` | `/api/github-analysis/<job_id>/report` | Retrieve completed, validated Pydantic JSON report. |
+| `GET` | `/api/github-analysis/<job_id>/html` | Serve standalone interactive HTML report. |
+
+### Selecting Base and Target Commits
+- **Default Behavior**: If `head_ref` is omitted, the engine uses `HEAD`. If `base_ref` is omitted, the engine automatically resolves the target commit's first parent (`HEAD~1`).
+- **Explicit References**: Specify commit SHAs (e.g. `2179ae9`), branch names (`main`, `feature/checkout`), or tags (`v2.1.0`).
+
+### Deterministic vs AI-Assisted Modes
+1. **Deterministic Mode**: Operates strictly via AST inspection, diff regex, and Git numstat analysis. Identifies removed assertions, button locator changes, and calculation revisions with 100% ground truth and zero external dependencies.
+2. **AI-Assisted Mode**: When Google Gemini (`gemini-2.5-flash`) is available, the engine synthesizes an executive summary highlighting testing advice and risk considerations. All repository data is treated as untrusted input and guarded against prompt injection. If the LLM quota is exhausted or unconfigured, the engine cleanly falls back to deterministic mode without failing.
+
+### Security Guarantees
+- **SSRF Prevention**: Strictly restricts repositories to `https://github.com/` (blocks internal IP ranges, loopbacks, and credentials).
+- **Subprocess Safety**: All Git commands execute via structured argument lists (`shell=False`). No user input is ever concatenated into shell strings.
+- **Sandboxing**: Repositories are cloned with `--no-checkout`, `-c core.hooksPath=/dev/null`, and cleaned up automatically upon exit. Analyzed code is never executed or imported.
+- **Secret Redaction**: API keys, bearer tokens, private keys, and 16-digit payment card numbers are masked across diffs, reports, and logs.
+- **Path Traversal Protection**: Job identifiers are validated with `^[a-zA-Z0-9_\-]+$`, rejecting directory traversal (`..`).
+
+### Running Feature Tests
+```powershell
+pytest tests/test_repo_analysis.py -v
+```
+Expected result: **18 passed**.
+

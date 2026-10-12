@@ -339,6 +339,44 @@ def cmd_reset(args) -> int:
     return 0
 
 
+def cmd_analyze(args) -> int:
+    """Execute GitHub change intelligence analysis from CLI."""
+    from engine.repo_analysis.models import RepoAnalysisRequest
+    from engine.repo_analysis.report_builder import analyze_repository_commits
+
+    repo_url = args.repo.strip()
+    base_ref = getattr(args, "base", None)
+    head_ref = getattr(args, "head", None)
+    allow_local = getattr(args, "allow_local", False)
+
+    print(f"--- SelfHeal GitHub Change Intelligence ---")
+    print(f"Repository : {repo_url}")
+    if base_ref:
+        print(f"Base Ref   : {base_ref}")
+    if head_ref:
+        print(f"Head Ref   : {head_ref}")
+
+    try:
+        req = RepoAnalysisRequest(repo_url=repo_url, base_ref=base_ref, head_ref=head_ref)
+        report = analyze_repository_commits(req, allow_local=allow_local)
+        print(f"\n[COMPLETED] Analysis Mode : {report.mode.value}")
+        print(f"            Duration      : {report.duration_ms} ms")
+        print(f"            Files Changed : {report.total_files_changed} (+{report.total_additions} / -{report.total_deletions})")
+        print(f"            Risk Findings : {len(report.findings)}")
+        print(f"            Job ID        : {report.job_id}")
+        print(f"            Report HTML   : runs/github_analysis/{report.job_id}/report.html")
+
+        if report.findings:
+            print("\n--- Key Grounded Findings ---")
+            for f in report.findings[:5]:
+                print(f"[{f.severity.value}] {f.what_changed} ({f.file_path})")
+
+        return 0
+    except Exception as exc:
+        print(f"\n[FAIL] Analysis failed: {exc}", file=sys.stderr)
+        return 1
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="SelfHeal E2E Autonomous Testing CLI")
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -369,6 +407,13 @@ def main(argv: Optional[List[str]] = None) -> int:
     # reset command
     subparsers.add_parser("reset", help="Reset recipes back to v1 baseline and clear runs")
 
+    # analyze command (GitHub Change Intelligence)
+    analyze_parser = subparsers.add_parser("analyze", help="Analyze GitHub repository commit diff")
+    analyze_parser.add_argument("--repo", required=True, help="GitHub repository URL")
+    analyze_parser.add_argument("--base", help="Base commit SHA or branch (defaults to target's parent)")
+    analyze_parser.add_argument("--head", help="Target (head) commit SHA or branch (defaults to HEAD)")
+    analyze_parser.add_argument("--allow-local", action="store_true", help="Allow local git directory for testing")
+
     parsed_args = parser.parse_args(argv)
 
     if parsed_args.command == "serve":
@@ -383,9 +428,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         return cmd_demo(parsed_args)
     elif parsed_args.command == "reset":
         return cmd_reset(parsed_args)
+    elif parsed_args.command == "analyze":
+        return cmd_analyze(parsed_args)
     else:
         parser.print_help()
         return 1
+
 
 
 if __name__ == "__main__":

@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Change Intelligence — SelfHeal Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .gh-form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: flex-end;
+    }
+    @media (max-width: 900px) {
+      .gh-form-grid { grid-template-columns: 1fr; }
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .form-input {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .form-input:focus {
+      border-color: var(--brand-accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .code-input {
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+    .preset-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .preset-chip {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      transition: all 0.15s ease;
+    }
+    .preset-chip:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge-crit { background: var(--mono-black); color: var(--mono-white); border: 1px solid var(--mono-black); }
+    .badge-hi { background: var(--mono-charcoal); color: var(--mono-white); border: 1px solid var(--mono-charcoal); }
+    .badge-med { background: var(--mono-graphite); color: var(--mono-white); border: 1px solid var(--mono-graphite); }
+    .badge-lo { background: var(--mono-offwhite); color: var(--mono-charcoal); border: 1px solid var(--mono-silver); }
+    .badge-tag { background: var(--mono-offwhite); color: var(--mono-black); border: 1px solid var(--mono-silver); font-family: var(--font-mono); font-size: 11px; }
+
+    .finding-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-left: 4px solid var(--mono-black);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: transform 0.1s ease, box-shadow 0.15s ease;
+    }
+    .finding-card:hover {
+      box-shadow: var(--shadow-sm);
+    }
+    .finding-card.sev-CRITICAL { border-left-color: var(--mono-black); }
+    .finding-card.sev-HIGH { border-left-color: var(--mono-charcoal); }
+    .finding-card.sev-MEDIUM { border-left-color: var(--mono-graphite); }
+    .finding-card.sev-LOW { border-left-color: var(--mono-silver); }
+
+    .diff-block {
+      background: var(--mono-nearblack);
+      color: var(--mono-white);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      margin-top: 10px;
+      border: 1px solid var(--mono-charcoal);
+    }
+    .diff-added { color: var(--mono-white); font-weight: 600; }
+    .diff-removed { color: var(--mono-gray); text-decoration: line-through; }
+    .commit-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+    }
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-subtle);
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 45%;
+      background: var(--brand-accent);
+      border-radius: 9999px;
+      animation: progress-indeterminate 1.5s infinite linear;
+    }
+    @keyframes progress-indeterminate {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(250%); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Shared Professional Header -->
+    <header class="app-header">
+      <div class="brand">
+        <a href="/" class="brand-link">
+          <div class="brand-logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">SelfHeal <span class="brand-sub">Studio</span></div>
+            <div class="brand-tagline">Intent-Aware E2E Testing • Survives UI Redesigns</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="nav-links">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/demo" class="nav-link">Interactive Demo</a>
+        <a href="/github-intelligence" class="nav-link active">GitHub Intelligence</a>
+        <a href="/contact" class="nav-link">Contact Us</a>
+      </nav>
+
+      <!-- Action -->
+      <div class="header-actions">
+        <a href="/demo" class="btn btn-primary btn-sm">Launch Test Studio &rarr;</a>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content">
+      <!-- Hero / Header Section -->
+      <div class="page-header" style="margin-bottom: 24px;">
+        <h1 class="page-title" style="font-size: 26px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">
+          GitHub Change Intelligence
+        </h1>
+        <p class="page-subtitle" style="font-size: 14px; color: var(--text-secondary); max-width: 850px;">
+          Grounded Git commit diff analysis. Submit any public GitHub repository to extract real file changes, identify UI locator drift before running tests, and assess regression risks with deterministic accuracy and AI-assisted synthesis.
+        </p>
+      </div>
+
+      <!-- Input Form Card -->
+      <div class="card" style="padding: 24px; margin-bottom: 24px;">
+        <h2 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Analyze Repository Commit Diff</h2>
+        <form id="ghAnalysisForm" onsubmit="handleFormSubmit(event)">
+          <div class="gh-form-grid">
+            <div class="form-group">
+              <label for="repoUrl">GitHub Repository URL</label>
+              <input
+                type="url"
+                id="repoUrl"
+                class="form-input"
+                placeholder="https://github.com/OWNER/REPOSITORY"
+                required
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <label for="baseRef">Base Ref / Commit SHA <span style="font-weight: normal; text-transform: none; color: var(--text-muted);">(Optional)</span></label>
+              <input
+                type="text"
+                id="baseRef"
+                class="form-input code-input"
+                placeholder="Leave blank for HEAD~1"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <label for="headRef">Target (Head) Ref <span style="font-weight: normal; text-transform: none; color: var(--text-muted);">(Optional)</span></label>
+              <input
+                type="text"
+                id="headRef"
+                class="form-input code-input"
+                placeholder="Leave blank for HEAD"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <button type="submit" id="submitBtn" class="btn btn-primary" style="height: 42px; padding: 0 20px;">
+                Analyze Changes
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Presets -->
+        <div style="margin-top: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <span style="font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-right: 8px;">Sample Presets:</span>
+            <div class="preset-chips" style="display: inline-flex;">
+              <button type="button" class="preset-chip" onclick="applyPreset('https://github.com/sameer2006-alt/coderizz-nlp', '', '')">
+                coderizz-nlp (Latest)
+              </button>
+              <button type="button" class="preset-chip" onclick="applyPreset('https://github.com/pallets/flask', '3.1.2', '3.1.3')">
+                Flask: 3.1.2 &rarr; 3.1.3
+              </button>
+              <button type="button" class="preset-chip" onclick="applyPreset('https://github.com/tiangolo/fastapi', '0.115.0', '0.115.1')">
+                FastAPI: 0.115.0 &rarr; 0.115.1
+              </button>
+              <button type="button" class="preset-chip" onclick="applyPreset('https://github.com/psf/requests', 'v2.31.0', 'v2.32.0')">
+                Requests: v2.31.0 &rarr; v2.32.0
+              </button>
+            </div>
+          </div>
+          <div>
+            <button type="button" class="preset-chip" style="color: var(--brand-accent); font-weight: 600;" onclick="clearRefs()">
+              &times; Clear Refs (Compare Latest)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State Card -->
+      <div id="loadingCard" class="card" style="display: none; padding: 24px; text-align: center; margin-bottom: 24px;">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: var(--brand-subtle); color: var(--brand-accent); margin-bottom: 12px;">
+          <svg style="width: 22px; height: 22px; animation: spin 1s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+            <path d="M12 2a10 10 0 0 1 10 10"></path>
+          </svg>
+        </div>
+        <h3 id="loadingStage" style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">Cloning repository workspace...</h3>
+        <p id="loadingDetail" style="font-size: 13px; color: var(--text-muted);">Acquiring minimal history and extracting Git diff in an isolated sandbox.</p>
+        <div class="progress-bar-container" style="max-width: 400px; margin: 16px auto 0 auto;">
+          <div class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <!-- Error Card -->
+      <div id="errorCard" class="card" style="display: none; padding: 18px 24px; margin-bottom: 24px; background: var(--mono-nearblack); border: 1px solid var(--mono-black); color: var(--mono-white);">
+        <div style="display: flex; align-items: flex-start; gap: 12px;">
+          <svg style="width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <div style="flex: 1;">
+            <strong style="font-weight: 600; font-size: 14px;">Analysis Request Notice</strong>
+            <div id="errorMsg" style="font-size: 13px; margin-top: 4px; color: var(--mono-silver);"></div>
+            <div id="errorRecoveryAction" style="margin-top: 10px; display: none;">
+              <button type="button" class="btn btn-primary btn-sm" onclick="clearRefsAndAnalyze()">
+                Clear Specific Refs &amp; Compare Latest Commits on Default Branch
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Results Container -->
+      <div id="resultsContainer" style="display: none;">
+        <!-- Overview Banner -->
+        <div class="card" style="padding: 20px 24px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <span id="statusBadge" class="stat-badge badge-med">COMPLETED</span>
+              <span id="modeBadge" class="stat-badge badge-tag">AI-ASSISTED</span>
+              <span id="jobIdLabel" style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);"></span>
+            </div>
+            <div id="repoSummaryText" style="font-size: 14px; font-weight: 600; color: var(--text-primary);"></div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <a id="btnOpenHtml" href="#" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+              <svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              Open Full HTML Report
+            </a>
+            <a id="btnDownloadJson" href="#" target="_blank" class="btn btn-secondary btn-sm">
+              Raw JSON
+            </a>
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px;">
+          <div class="card" style="padding: 16px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Files Changed</div>
+            <div id="statFiles" style="font-size: 24px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">0</div>
+          </div>
+          <div class="card" style="padding: 16px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Additions</div>
+            <div id="statAdditions" style="font-size: 24px; font-weight: 700; color: var(--mono-black); margin-top: 4px;">+0</div>
+          </div>
+          <div class="card" style="padding: 16px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Deletions</div>
+            <div id="statDeletions" style="font-size: 24px; font-weight: 700; color: var(--mono-gray); text-decoration: line-through; margin-top: 4px;">-0</div>
+          </div>
+          <div class="card" style="padding: 16px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Risk Findings</div>
+            <div id="statFindings" style="font-size: 24px; font-weight: 700; color: var(--mono-black); margin-top: 4px;">0</div>
+          </div>
+          <div class="card" style="padding: 16px;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Duration</div>
+            <div id="statDuration" style="font-size: 24px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">0 ms</div>
+          </div>
+        </div>
+
+        <!-- Commits Comparison Cards -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+          <div class="card" style="padding: 18px;">
+            <h3 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;">Base Commit</h3>
+            <div id="baseCommitBox" class="commit-box"></div>
+          </div>
+          <div class="card" style="padding: 18px;">
+            <h3 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;">Target (Head) Commit</h3>
+            <div id="headCommitBox" class="commit-box"></div>
+          </div>
+        </div>
+
+        <!-- Executive AI Analysis Box -->
+        <div class="card" style="padding: 24px; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h3 style="font-size: 16px; font-weight: 600;">Executive Analysis & AI Explanation</h3>
+            <span id="aiProviderLabel" style="font-size: 12px; color: var(--text-muted);">Provider: Google Gemini</span>
+          </div>
+          <div style="background: var(--bg-subtle); border-left: 3px solid var(--brand-accent); padding: 10px 14px; border-radius: 4px; font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
+            <strong>Untrusted Content Guard:</strong> Repository contents, commit messages, and patches are passive untrusted data. Model explanations are advisory and strictly separated from verified diff facts.
+          </div>
+          <div id="aiExplanationText" style="font-size: 14px; line-height: 1.7; white-space: pre-wrap; color: var(--text-primary);"></div>
+        </div>
+
+        <!-- Grounded Risk Findings -->
+        <div class="card" style="padding: 24px; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 16px; font-weight: 600;">Grounded Risk Findings (<span id="findingsCount">0</span>)</h3>
+            <span style="font-size: 12px; color: var(--text-muted);">Proven by AST, regex, and patch inspection</span>
+          </div>
+          <div id="findingsList"></div>
+        </div>
+
+        <!-- Changed Files List -->
+        <div class="card" style="padding: 24px; margin-bottom: 24px;">
+          <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">Changed Files (<span id="filesCount">0</span>)</h3>
+          <div id="filesList"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Professional Footer -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span class="footer-copy">&copy; 2026 SelfHeal Engineering &bull; GitHub Change Intelligence</span>
+      </div>
+      <div class="footer-right">
+        <span class="footer-meta">Domain: Software Engineering &bull; Autonomous E2E Testing</span>
+      </div>
+    </footer>
+  </div>
+
+  <style>
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+  </style>
+
+  <!-- Client-side Controller -->
+  <script>
+    let pollInterval = null;
+    let currentRepoUrl = '';
+
+    function applyPreset(url, base, head) {
+      document.getElementById('repoUrl').value = url;
+      document.getElementById('baseRef').value = base;
+      document.getElementById('headRef').value = head;
+      currentRepoUrl = url;
+      document.getElementById('errorCard').style.display = 'none';
+    }
+
+    function clearRefs() {
+      document.getElementById('baseRef').value = '';
+      document.getElementById('headRef').value = '';
+    }
+
+    function clearRefsAndAnalyze() {
+      clearRefs();
+      document.getElementById('errorCard').style.display = 'none';
+      document.getElementById('submitBtn').click();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const repoInput = document.getElementById('repoUrl');
+      if (repoInput) {
+        currentRepoUrl = repoInput.value.trim();
+        repoInput.addEventListener('input', (e) => {
+          const val = e.target.value.trim();
+          // If user switches repository URL, clear specific refs so stale tags don't trigger revision errors
+          if (currentRepoUrl && val !== currentRepoUrl) {
+            clearRefs();
+          }
+          currentRepoUrl = val;
+        });
+      }
+    });
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const repoUrl = document.getElementById('repoUrl').value.trim();
+      const baseRef = document.getElementById('baseRef').value.trim();
+      const headRef = document.getElementById('headRef').value.trim();
+
+      if (!repoUrl) return;
+
+      // Reset UI state
+      document.getElementById('errorCard').style.display = 'none';
+      document.getElementById('resultsContainer').style.display = 'none';
+      document.getElementById('loadingCard').style.display = 'block';
+      document.getElementById('submitBtn').disabled = true;
+
+      document.getElementById('loadingStage').textContent = 'Submitting repository request...';
+      document.getElementById('loadingDetail').textContent = 'Connecting to backend analysis engine...';
+
+      try {
+        const res = await fetch('/api/github-analysis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            repo_url: repoUrl,
+            base_ref: baseRef || null,
+            head_ref: headRef || null
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to submit analysis request.');
+        }
+
+        const jobId = data.job_id;
+        pollJobStatus(jobId);
+
+      } catch (err) {
+        showError(err.message);
+      }
+    }
+
+    function pollJobStatus(jobId) {
+      if (pollInterval) clearInterval(pollInterval);
+
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/github-analysis/${encodeURIComponent(jobId)}`);
+          if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || 'Failed to query job status.');
+          }
+
+          const job = await res.json();
+          document.getElementById('loadingStage').textContent = job.progress || 'Processing...';
+
+          if (job.status === 'COMPLETED') {
+            clearInterval(pollInterval);
+            fetchFullReport(jobId);
+          } else if (job.status === 'FAILED') {
+            clearInterval(pollInterval);
+            showError(job.error || 'Analysis failed in worker.');
+          }
+        } catch (err) {
+          clearInterval(pollInterval);
+          showError(err.message);
+        }
+      }, 1500);
+    }
+
+    async function fetchFullReport(jobId) {
+      try {
+        const res = await fetch(`/api/github-analysis/${encodeURIComponent(jobId)}/report`);
+        if (!res.ok) {
+          throw new Error('Failed to retrieve completed report.');
+        }
+
+        const report = await res.json();
+        renderReport(report);
+      } catch (err) {
+        showError(err.message);
+      }
+    }
+
+    function renderReport(r) {
+      document.getElementById('loadingCard').style.display = 'none';
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('resultsContainer').style.display = 'block';
+
+      // Header & Links
+      document.getElementById('statusBadge').textContent = r.status;
+      document.getElementById('modeBadge').textContent = r.mode;
+      document.getElementById('modeBadge').className = r.mode === 'AI_ASSISTED' ? 'stat-badge badge-med' : 'stat-badge badge-tag';
+      document.getElementById('jobIdLabel').textContent = `Job: ${r.job_id}`;
+      document.getElementById('repoSummaryText').textContent = r.repo_url;
+
+      document.getElementById('btnOpenHtml').href = `/api/github-analysis/${encodeURIComponent(r.job_id)}/html`;
+      document.getElementById('btnDownloadJson').href = `/api/github-analysis/${encodeURIComponent(r.job_id)}/report`;
+
+      // Metrics
+      document.getElementById('statFiles').textContent = r.total_files_changed;
+      document.getElementById('statAdditions').textContent = `+${r.total_additions}`;
+      document.getElementById('statDeletions').textContent = `-${r.total_deletions}`;
+      document.getElementById('statFindings').textContent = (r.findings || []).length;
+      document.getElementById('statDuration').textContent = `${r.duration_ms} ms`;
+
+      // Commits
+      const baseBox = document.getElementById('baseCommitBox');
+      if (r.base_commit) {
+        baseBox.innerHTML = `
+          <div><strong>SHA:</strong> ${r.base_commit.short_sha} (${r.base_commit.sha.substring(0, 16)}...)</div>
+          <div><strong>Author:</strong> ${escapeHtml(r.base_commit.author_name)}</div>
+          <div><strong>Date:</strong> ${r.base_commit.date}</div>
+          <div style="margin-top: 8px; color: var(--brand-accent);">${escapeHtml(r.base_commit.message)}</div>
+        `;
+      } else {
+        baseBox.textContent = 'Initial commit state';
+      }
+
+      const headBox = document.getElementById('headCommitBox');
+      if (r.head_commit) {
+        headBox.innerHTML = `
+          <div><strong>SHA:</strong> ${r.head_commit.short_sha} (${r.head_commit.sha.substring(0, 16)}...)</div>
+          <div><strong>Author:</strong> ${escapeHtml(r.head_commit.author_name)}</div>
+          <div><strong>Date:</strong> ${r.head_commit.date}</div>
+          <div style="margin-top: 8px; color: var(--brand-accent);">${escapeHtml(r.head_commit.message)}</div>
+        `;
+      } else {
+        headBox.textContent = 'Head commit state';
+      }
+
+      // AI Explanation
+      document.getElementById('aiExplanationText').textContent = r.ai_explanation || 'No explanation generated.';
+      document.getElementById('aiProviderLabel').textContent = r.mode === 'AI_ASSISTED' ? 'Provider: Google Gemini' : 'Mode: Deterministic Rules';
+
+      // Findings
+      const findingsList = document.getElementById('findingsList');
+      const findings = r.findings || [];
+      document.getElementById('findingsCount').textContent = findings.length;
+      findingsList.innerHTML = '';
+
+      if (findings.length === 0) {
+        findingsList.innerHTML = '<p style="color: var(--text-muted); font-size: 13.5px;">No critical regressions, removed validations, or breaking locator drifts detected.</p>';
+      } else {
+        findings.forEach(f => {
+          const div = document.createElement('div');
+          div.className = `finding-card sev-${f.severity}`;
+          div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+              <div>
+                <span class="stat-badge badge-${f.severity === 'CRITICAL' ? 'crit' : f.severity === 'HIGH' ? 'hi' : 'med'}">${f.severity}</span>
+                <span class="stat-badge badge-tag" style="margin-left: 6px;">${f.confidence} CONFIDENCE</span>
+                <strong style="margin-left: 8px; font-size: 14px;">${escapeHtml(f.what_changed)}</strong>
+              </div>
+              <code style="font-size: 11px; color: var(--text-muted);">${f.id}</code>
+            </div>
+            <div style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 6px;">
+              <strong>File:</strong> <code>${escapeHtml(f.file_path)}</code> (${escapeHtml(f.line_range)})
+            </div>
+            <div style="font-size: 13px; margin-bottom: 6px;">
+              <strong>Why it matters:</strong> ${escapeHtml(f.why_it_matters)}
+            </div>
+            <div style="font-size: 13px; color: var(--mono-black); margin-bottom: 6px;">
+              <strong>Potential Impact:</strong> ${escapeHtml(f.potential_impact)}
+            </div>
+            <div style="font-size: 13px; color: var(--mono-graphite);">
+              <strong>Recommended Follow-up:</strong> ${escapeHtml(f.recommended_followup)}
+            </div>
+            ${f.diff_hunk ? `<div class="diff-block">${escapeHtml(f.diff_hunk)}</div>` : ''}
+          `;
+          findingsList.appendChild(div);
+        });
+      }
+
+      // Changed Files
+      const filesList = document.getElementById('filesList');
+      const files = r.files || [];
+      document.getElementById('filesCount').textContent = files.length;
+      filesList.innerHTML = '';
+
+      files.forEach(file => {
+        const fileDiv = document.createElement('div');
+        fileDiv.style.cssText = 'border: 1px solid var(--border-default); border-radius: var(--radius-md); margin-bottom: 10px; overflow: hidden;';
+        fileDiv.innerHTML = `
+          <div style="background: var(--bg-subtle); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-family: var(--font-mono);">
+            <div>
+              <span class="stat-badge badge-tag">${file.status.toUpperCase()}</span>
+              <span class="stat-badge badge-med" style="margin-left: 6px;">${file.category.toUpperCase()}</span>
+              <strong style="margin-left: 8px; font-family: inherit;">${escapeHtml(file.path)}</strong>
+              ${file.old_path ? `<span style="color: var(--text-muted);"> &larr; renamed from ${escapeHtml(file.old_path)}</span>` : ''}
+            </div>
+            <div>
+              <span style="color: var(--mono-black); font-weight: 600;">+${file.additions}</span> / <span style="color: var(--mono-gray); text-decoration: line-through;">-${file.deletions}</span>
+            </div>
+          </div>
+          ${file.patch ? `<div class="diff-block" style="margin: 0; border-radius: 0;">${escapeHtml(file.patch)}</div>` : ''}
+        `;
+        filesList.appendChild(fileDiv);
+      });
+    }
+
+    function showError(msg) {
+      document.getElementById('loadingCard').style.display = 'none';
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('errorMsg').textContent = msg;
+
+      const lower = (msg || '').toLowerCase();
+      const isRefIssue = lower.includes('revision') ||
+                         lower.includes('does not exist') ||
+                         lower.includes('cannot be resolved') ||
+                         lower.includes('needed a single revision');
+      const recAction = document.getElementById('errorRecoveryAction');
+      if (recAction) {
+        recAction.style.display = isRefIssue ? 'block' : 'none';
+      }
+      document.getElementById('errorCard').style.display = 'block';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

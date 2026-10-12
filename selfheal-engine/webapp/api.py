@@ -158,3 +158,132 @@ def submit_contact():
         "contact_id": contact_id,
         "message": "Thank you! Your inquiry has been recorded and submitted to the engineering team.",
     }), 200
+
+
+# -------------------------------------------------------------
+# GitHub Change Intelligence API Endpoints
+# -------------------------------------------------------------
+
+@api_bp.route("/github-analysis", methods=["POST"])
+def submit_github_analysis():
+    """Submit a GitHub repository commit comparison for asynchronous analysis."""
+    import os
+    from engine.repo_analysis.models import RepoAnalysisRequest
+    from engine.repo_analysis.github_service import (
+        GitHubValidationError,
+        validate_and_normalize_repo_url,
+        validate_git_ref,
+    )
+    from engine.repo_analysis.report_builder import job_manager
+
+    payload = request.get_json(silent=True) or {}
+    repo_url = payload.get("repo_url", "").strip()
+    base_ref = payload.get("base_ref")
+    head_ref = payload.get("head_ref")
+    allow_local = bool(payload.get("allow_local", False)) and os.getenv("APP_ENV") != "production"
+
+    if not repo_url:
+        return jsonify({"error": "repo_url is a required field."}), 400
+
+    try:
+        norm_url, _, _ = validate_and_normalize_repo_url(repo_url, allow_local=allow_local)
+        clean_base = validate_git_ref(base_ref)
+        clean_head = validate_git_ref(head_ref)
+
+        req_model = RepoAnalysisRequest(
+            repo_url=norm_url,
+            base_ref=clean_base,
+            head_ref=clean_head,
+        )
+        job_id = job_manager.submit_job(req_model, allow_local=allow_local)
+
+        return jsonify({
+            "job_id": job_id,
+            "status": "QUEUED",
+            "message": "GitHub change intelligence job accepted and running in background.",
+            "repo_url": norm_url,
+        }), 202
+
+    except GitHubValidationError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except Exception as exc:
+        return jsonify({"error": f"Failed to submit analysis: {exc}"}), 500
+
+
+@api_bp.route("/github-analysis/<job_id>", methods=["GET"])
+def get_github_analysis_status(job_id: str):
+    """Retrieve status, progress, and summary of a GitHub change intelligence job."""
+    from engine.repo_analysis.report_builder import job_manager, validate_job_id
+
+    try:
+        clean_job_id = validate_job_id(job_id)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    job = job_manager.get_job(clean_job_id)
+    if not job:
+        return jsonify({"error": f"Analysis job '{clean_job_id}' not found."}), 404
+
+    # Return status and high-level progress
+    return jsonify({
+        "job_id": clean_job_id,
+        "status": job.get("status"),
+        "progress": job.get("progress"),
+        "created_at": job.get("created_at"),
+        "repo_url": job.get("repo_url"),
+        "error": job.get("error"),
+        "has_report": bool(job.get("report")),
+    }), 200
+
+
+@api_bp.route("/github-analysis/<job_id>/report", methods=["GET"])
+def get_github_analysis_report(job_id: str):
+    """Retrieve the completed, structured JSON report for an analysis job."""
+    from engine.repo_analysis.report_builder import job_manager, validate_job_id
+
+    try:
+        clean_job_id = validate_job_id(job_id)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    job = job_manager.get_job(clean_job_id)
+    if not job:
+        return jsonify({"error": f"Analysis job '{clean_job_id}' not found."}), 404
+
+    if job.get("status") == "FAILED":
+        return jsonify({
+            "error": "Analysis failed",
+            "detail": job.get("error", "Unknown error occurred during analysis"),
+        }), 500
+
+    if job.get("status") in ("QUEUED", "RUNNING"):
+        return jsonify({
+            "status": job.get("status"),
+            "message": "Analysis is currently processing. Please poll status.",
+        }), 202
+
+    report = job.get("report")
+    if not report:
+        return jsonify({"error": "Report data not available."}), 404
+
+    return jsonify(report), 200
+
+
+@api_bp.route("/github-analysis/<job_id>/html", methods=["GET"])
+def get_github_analysis_html(job_id: str):
+    """Serve the standalone rendered HTML report for an analysis job."""
+    from engine.repo_analysis.report_builder import job_manager, validate_job_id
+
+    try:
+        clean_job_id = validate_job_id(job_id)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    html = job_manager.get_html_report(clean_job_id)
+    if not html:
+        return jsonify({"error": f"HTML report for job '{clean_job_id}' not found or still generating."}), 404
+
+    return html, 200, {"Content-Type": "text/html; charset=utf-8"}
+

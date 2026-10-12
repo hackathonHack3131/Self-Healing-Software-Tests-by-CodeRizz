@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from flask import Flask, render_template
+from flask import Flask, redirect, render_template
 from webapp.api import api_bp
 
 
@@ -33,7 +33,7 @@ def create_app() -> Flask:
 
     @app.route("/about")
     def about():
-        """Serve the Architecture & Global Rules page."""
+        """Serve the Architecture & About page."""
         return render_template("about.html")
 
     @app.route("/contact")
@@ -41,7 +41,14 @@ def create_app() -> Flask:
         """Serve the Contact & Feedback page."""
         return render_template("contact.html")
 
+    @app.route("/github-intelligence")
+    @app.route("/github")
+    def github_intelligence():
+        """Serve the GitHub Change Intelligence page."""
+        return render_template("github_intelligence.html")
+
     return app
+
 
 
 if __name__ == "__main__":

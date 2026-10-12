@@ -8,6 +8,1185 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    /* ==========================================================================
+       Scoped Styles for Upgraded Interactive Sections (Linear / Vercel style)
+       ========================================================================== */
+
+    /* Hero Architecture Pipeline Visual */
+    .workflow-pipeline-card {
+      margin-top: 32px;
+      margin-bottom: 24px;
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      box-shadow: var(--shadow-sm);
+      text-align: left;
+    }
+    .pipeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .pipeline-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--mono-black);
+      background: var(--mono-offwhite);
+      border: 1px solid var(--mono-silver);
+      padding: 2px 8px;
+      border-radius: var(--radius-xs);
+    }
+    .pipeline-meta {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--mono-gray);
+    }
+    .pipeline-flow {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    @media (max-width: 960px) {
+      .pipeline-flow {
+        flex-direction: column;
+      }
+      .pipeline-arrow {
+        transform: rotate(90deg);
+        align-self: center;
+        padding: 4px 0;
+      }
+    }
+    .pipeline-step {
+      flex: 1;
+      min-width: 0;
+      background: var(--bg-page);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+    .pipeline-step:hover {
+      border-color: var(--mono-graphite);
+      background: var(--mono-offwhite);
+    }
+    .pipeline-step-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--mono-graphite);
+    }
+    .pipeline-step-title {
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mono-black);
+      letter-spacing: -0.01em;
+    }
+    .pipeline-step-desc {
+      font-size: 11.5px;
+      color: var(--mono-graphite);
+      line-height: 1.4;
+    }
+    .pipeline-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--mono-gray);
+      font-size: 16px;
+      font-weight: 700;
+      padding: 0 4px;
+      user-select: none;
+    }
+
+    /* Section 1: Overview Telemetry Card */
+    .telemetry-overview-card {
+      margin-top: 16px;
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 24px;
+      text-align: left;
+      overflow: hidden;
+    }
+    .overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .overview-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .overview-indicator-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--mono-black);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+      animation: pulseDot 2s infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.7; }
+    }
+    .overview-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+    .btn-ghost-sm {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 11.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-ghost-sm:hover {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      border-color: var(--border-hover);
+    }
+    .btn-ghost-sm:focus-visible {
+      outline: 2px solid var(--mono-black);
+      outline-offset: 1px;
+    }
+    .overview-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      width: 100%;
+      box-sizing: border-box;
+      align-items: stretch;
+    }
+    @media (max-width: 1024px) {
+      .overview-metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 600px) {
+      .overview-metrics-grid { grid-template-columns: 1fr; }
+    }
+    .overview-metric-item {
+      min-width: 0;
+      box-sizing: border-box;
+      padding: 16px;
+      background: var(--bg-page);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+    .overview-metric-item:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-xs);
+    }
+    .metric-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      min-height: 22px;
+    }
+    .metric-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 1;
+    }
+    .metric-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: var(--radius-xs);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .metric-main-val {
+      font-family: var(--font-heading);
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.25;
+    }
+    .metric-meta {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Section 2: Comparison Explorer */
+    .section-tag-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .tag-explanatory {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
+      padding: 2px 8px;
+      border-radius: var(--radius-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .interactive-comparison-explorer {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .comparison-tabs {
+      display: flex;
+      gap: 8px;
+      background: var(--bg-subtle);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-default);
+      overflow-x: auto;
+    }
+    .comp-tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .comp-tab:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.5);
+    }
+    .comp-tab.active {
+      background: var(--mono-black);
+      color: var(--mono-white);
+      box-shadow: var(--shadow-xs);
+    }
+    .comp-tab:focus-visible {
+      outline: 2px solid var(--mono-black);
+      outline-offset: -1px;
+    }
+    .tab-index {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      opacity: 0.6;
+    }
+    .comparison-display {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 860px) {
+      .comparison-display { grid-template-columns: 1fr; }
+    }
+    .comparison-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+    .comparison-card.comp-fragile {
+      border-left: 4px solid var(--mono-gray);
+    }
+    .comparison-card.comp-selfheal {
+      border-left: 4px solid var(--mono-black);
+    }
+    .comp-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .comp-card-title {
+      font-family: var(--font-heading);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+    .comp-code-snippet {
+      background: var(--mono-nearblack);
+      color: var(--mono-white);
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      line-height: 1.5;
+      overflow-x: auto;
+      border: 1px solid var(--mono-charcoal);
+    }
+    .comp-points-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .comp-points-list li {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      position: relative;
+      padding-left: 18px;
+    }
+    .comp-points-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+    .comp-fragile .comp-points-list li::before { color: var(--mono-gray); }
+    .comp-selfheal .comp-points-list li::before { color: var(--mono-black); }
+    .comp-points-list strong { color: var(--text-primary); font-weight: 600; }
+    .comparison-footer-hint {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-page);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* Section 3: Scenario Explorer */
+    .scenario-filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-width: 100%;
+    }
+    .filter-pill {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-pill:hover {
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+    .filter-pill.active {
+      background: var(--mono-black);
+      border-color: var(--mono-black);
+      color: #ffffff;
+    }
+    .filter-pill:focus-visible {
+      outline: 2px solid var(--mono-black);
+      outline-offset: 2px;
+    }
+    .filter-count-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .scenario-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 1024px) {
+      .scenario-selector-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .scenario-selector-grid { grid-template-columns: 1fr; }
+    }
+    .scenario-interactive-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.18s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+    .scenario-interactive-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-1px);
+    }
+    .scenario-interactive-card.selected {
+      border-color: var(--mono-black);
+      box-shadow: 0 0 0 2px var(--mono-black);
+      background: var(--mono-offwhite);
+    }
+    .scenario-interactive-card:focus-visible {
+      outline: 2px solid var(--mono-black);
+      outline-offset: 2px;
+    }
+    .scenario-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .scenario-card-title {
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .scenario-card-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      flex: 1;
+    }
+    .scenario-direct-link {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--mono-black);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .scenario-direct-link:hover { text-decoration: underline; }
+
+    /* Scenario Detail Panel */
+    .scenario-detail-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .detail-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .detail-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .detail-panel-title {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) {
+      .detail-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+    .detail-item-box {
+      background: var(--bg-page);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+    .detail-item-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+    .detail-item-text {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+    .detail-item-text strong {
+      color: var(--text-primary);
+    }
+    .detail-actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .detail-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    /* ==========================================================================
+       Feature 2: UI Drift Visualizer Styles
+       ========================================================================== */
+    .drift-controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 12px 18px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .drift-view-pills, .drift-step-pills {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+      max-width: 100%;
+    }
+    .drift-ctrl-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-right: 6px;
+    }
+    .drift-pill {
+      background: var(--bg-page);
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      padding: 5px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .drift-pill:hover {
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+    .drift-pill.active {
+      background: var(--mono-black);
+      border-color: var(--mono-black);
+      color: var(--mono-white);
+    }
+    .drift-pill:focus-visible {
+      outline: 2px solid var(--mono-black);
+      outline-offset: 1px;
+    }
+    .drift-comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+      transition: all 0.2s ease;
+      max-width: 100%;
+    }
+    @media (max-width: 900px) {
+      .drift-comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .drift-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: var(--shadow-xs);
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .drift-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .drift-card-title {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .drift-card-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .drift-mockup-frame {
+      background: var(--bg-page);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .mockup-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11.5px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      border-bottom: 1px dashed var(--border-subtle);
+      padding-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .mockup-fields-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mockup-field-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xs);
+      padding: 7px 10px;
+      font-size: 12px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .mockup-field-tag {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--mono-graphite);
+      background: var(--mono-offwhite);
+      border: 1px solid var(--mono-silver);
+      padding: 1px 6px;
+      border-radius: var(--radius-xs);
+      word-break: break-all;
+    }
+    .mockup-step-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .mockup-step-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      padding: 2px 8px;
+      border-radius: var(--radius-xs);
+      background: var(--mono-offwhite);
+      border: 1px solid var(--mono-silver);
+      color: var(--mono-graphite);
+    }
+    .mockup-step-badge.active {
+      background: var(--mono-black);
+      border-color: var(--mono-black);
+      color: var(--mono-white);
+    }
+    .drift-code-box {
+      background: var(--mono-nearblack);
+      color: var(--mono-white);
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      line-height: 1.5;
+      overflow-x: auto;
+      border: 1px solid var(--mono-charcoal);
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .drift-analysis-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+    .drift-analysis-list li {
+      position: relative;
+      padding-left: 16px;
+    }
+    .drift-analysis-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--mono-black);
+      font-weight: bold;
+    }
+    .drift-analysis-list strong {
+      color: var(--text-primary);
+    }
+    .drift-callout-banner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-left: 4px solid var(--mono-black);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .drift-callout-banner strong {
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       Feature 3: Failure Diagnosis Center Styles
+       ========================================================================== */
+    .diagnosis-filters-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .diagnosis-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+      max-width: 100%;
+    }
+    @media (max-width: 1024px) {
+      .diagnosis-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .diagnosis-grid { grid-template-columns: 1fr; }
+    }
+    .diagnosis-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .diagnosis-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-xs);
+      transform: translateY(-1px);
+    }
+    .diagnosis-card.selected {
+      border-color: var(--mono-black);
+      box-shadow: 0 0 0 2px var(--mono-black);
+      background: var(--mono-offwhite);
+    }
+    .diagnosis-card:focus-visible {
+      outline: 2px solid var(--mono-black);
+      outline-offset: 1px;
+    }
+    .diag-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .diag-card-title {
+      font-family: var(--font-heading);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .diag-card-rule {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+    .diag-card-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      flex: 1;
+    }
+    .diagnosis-detail-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .diag-detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .diag-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+      max-width: 100%;
+    }
+    .diag-detail-box {
+      background: var(--bg-page);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+      box-sizing: border-box;
+      word-break: break-word;
+    }
+    .diag-detail-box-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+    .diag-detail-box-val {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .diag-detail-box-val strong {
+      color: var(--text-primary);
+    }
+    .zero-false-healing-box {
+      background: var(--mono-nearblack);
+      border: 1px solid var(--mono-charcoal);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      color: var(--mono-white);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .zero-false-healing-title {
+      font-family: var(--font-heading);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--mono-white);
+      margin-bottom: 4px;
+    }
+    .zero-false-healing-desc {
+      font-size: 12.5px;
+      color: var(--mono-silver);
+      line-height: 1.5;
+    }
+
+    /* Section 4: Guardrails Explorer */
+    .guardrails-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .guardrail-categories {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .guardrail-cat-pill {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .guardrail-cat-pill:hover {
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+    .guardrail-cat-pill.active {
+      background: var(--mono-black);
+      border-color: var(--mono-black);
+      color: #ffffff;
+    }
+    .guardrail-cat-pill:focus-visible {
+      outline: 2px solid var(--mono-black);
+      outline-offset: 2px;
+    }
+    .guardrail-search-box {
+      position: relative;
+      min-width: 240px;
+    }
+    .guardrail-search-input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px 6px 30px;
+      font-size: 12px;
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      transition: border-color 0.15s;
+    }
+    .guardrail-search-input:focus {
+      outline: none;
+      border-color: var(--mono-black);
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+    }
+    .guardrail-search-icon {
+      position: absolute;
+      left: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .guardrails-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 1024px) {
+      .guardrails-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .guardrails-grid { grid-template-columns: 1fr; }
+    }
+    .guardrail-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .guardrail-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-sm);
+    }
+    .guardrail-card.expanded {
+      border-color: var(--mono-black);
+    }
+    .guardrail-card-top {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+    .guardrail-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .guardrail-cat-badge {
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      padding: 2px 7px;
+      border-radius: var(--radius-xs);
+    }
+    .guardrail-title {
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .guardrail-summary {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .guardrail-expand-btn {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 18px;
+      background: var(--bg-page);
+      border: none;
+      border-top: 1px solid var(--border-subtle);
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .guardrail-expand-btn:hover {
+      background: var(--bg-subtle);
+      color: var(--mono-black);
+    }
+    .guardrail-expand-btn:focus-visible {
+      outline: 2px solid var(--mono-black);
+      outline-offset: -2px;
+    }
+    .guardrail-chevron {
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .guardrail-card.expanded .guardrail-chevron {
+      transform: rotate(180deg);
+    }
+    .guardrail-drawer {
+      padding: 16px 18px;
+      background: var(--bg-page);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 12px;
+    }
+    .guardrail-drawer[hidden] {
+      display: none;
+    }
+    .drawer-section-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 3px;
+    }
+    .drawer-text {
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+    .drawer-code-ref {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      padding: 2px 6px;
+      border-radius: var(--radius-xs);
+      color: var(--text-primary);
+      display: inline-block;
+      margin: 2px 2px 2px 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .overview-indicator-dot { animation: none !important; }
+      .scenario-interactive-card, .comp-tab, .filter-pill, .guardrail-card, .guardrail-chevron {
+        transition: none !important;
+        transform: none !important;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="app-container">
@@ -31,7 +1210,7 @@
       <nav class="nav-links">
         <a href="/" class="nav-link active">Home</a>
         <a href="/demo" class="nav-link">Interactive Demo</a>
-        <a href="/about" class="nav-link">Architecture & About</a>
+        <a href="/github-intelligence" class="nav-link">GitHub Intelligence</a>
         <a href="/contact" class="nav-link">Contact Us</a>
       </nav>
 
@@ -69,178 +1248,871 @@
             <span>Launch Interactive Demo</span>
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
-          <a href="/about" class="btn btn-secondary btn-lg">
-            <span>Architecture & Global Rules</span>
-          </a>
         </div>
 
-        <!-- Proof Metrics Bar -->
-        <div class="proof-bar">
-          <div class="proof-item">
-            <div class="proof-num">0</div>
-            <div class="proof-label">LLM Calls on Baseline</div>
-            <div class="proof-sub">Passing tests run directly without AI overhead</div>
+        <!-- Architectural Workflow Pipeline Visual -->
+        <div class="workflow-pipeline-card">
+          <div class="pipeline-header">
+            <span class="pipeline-tag">INTENT-DRIVEN RECONSTRUCTION ENGINE</span>
+            <span class="pipeline-meta">5-Stage Deterministic Healing Pipeline</span>
           </div>
-          <div class="proof-divider"></div>
-          <div class="proof-item">
-            <div class="proof-num">100%</div>
-            <div class="proof-label">Deterministic Verification</div>
-            <div class="proof-sub">Verified on clean replay in fresh browser</div>
+          <div class="pipeline-flow">
+            <div class="pipeline-step">
+              <div class="pipeline-step-num">01</div>
+              <div class="pipeline-step-body">
+                <div class="pipeline-step-title">Immutable Intent</div>
+                <div class="pipeline-step-desc">SHA-256 protected contract with business invariants</div>
+              </div>
+            </div>
+            <div class="pipeline-arrow">&rarr;</div>
+            <div class="pipeline-step">
+              <div class="pipeline-step-num">02</div>
+              <div class="pipeline-step-body">
+                <div class="pipeline-step-title">Deterministic Replay</div>
+                <div class="pipeline-step-desc">Zero-LLM clean context run against current target</div>
+              </div>
+            </div>
+            <div class="pipeline-arrow">&rarr;</div>
+            <div class="pipeline-step">
+              <div class="pipeline-step-num">03</div>
+              <div class="pipeline-step-body">
+                <div class="pipeline-step-title">Structural UI Diff</div>
+                <div class="pipeline-step-desc">Accessibility tree snapshot &amp; element drift triage</div>
+              </div>
+            </div>
+            <div class="pipeline-arrow">&rarr;</div>
+            <div class="pipeline-step">
+              <div class="pipeline-step-num">04</div>
+              <div class="pipeline-step-body">
+                <div class="pipeline-step-title">Deep Agent Rebuild</div>
+                <div class="pipeline-step-desc">Reconstructs multi-step recipe (0 eval/exec)</div>
+              </div>
+            </div>
+            <div class="pipeline-arrow">&rarr;</div>
+            <div class="pipeline-step">
+              <div class="pipeline-step-num">05</div>
+              <div class="pipeline-step-body">
+                <div class="pipeline-step-title">Verifier Verdict</div>
+                <div class="pipeline-step-desc">Replay proof: PASS_AFTER_HEAL or defect rejection</div>
+              </div>
+            </div>
           </div>
-          <div class="proof-divider"></div>
-          <div class="proof-item">
-            <div class="proof-num">4-in-1</div>
-            <div class="proof-label">Multi-Step Reconstruction</div>
-            <div class="proof-sub">Rebuilds complete workflows, not just 1 locator</div>
+        </div>
+
+        <!-- System Telemetry & Environment Overview -->
+        <div class="telemetry-overview-card" id="telemetryOverview">
+          <div class="overview-header">
+            <div class="overview-title-group">
+              <span class="overview-indicator-dot" id="systemLiveDot"></span>
+              <span class="overview-title">System Telemetry &amp; Environment Overview</span>
+            </div>
+            <div class="overview-actions">
+              <button type="button" class="btn-ghost-sm" id="btnRefreshTelemetry" title="Refresh system telemetry">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 4v6h-6M1 20v-6h6"/>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                </svg>
+                <span>Live Refresh</span>
+              </button>
+            </div>
           </div>
-          <div class="proof-divider"></div>
-          <div class="proof-item">
-            <div class="proof-num">Zero</div>
-            <div class="proof-label">Falsely Healed Bugs</div>
-            <div class="proof-sub">Strictly refuses to mask server 500 or math errors</div>
+
+          <div class="overview-metrics-grid">
+            <!-- Target App Health -->
+            <div class="overview-metric-item">
+              <div class="metric-top">
+                <span class="metric-label">Target Health</span>
+                <span class="metric-status-badge badge-neutral" id="ovTargetBadge">Checking...</span>
+              </div>
+              <div class="metric-main-val" id="ovTargetVal">:5000</div>
+              <div class="metric-meta" id="ovTargetMeta" title="http://127.0.0.1:5000/health">Pinging target :5000...</div>
+            </div>
+
+            <!-- MongoDB Lineage -->
+            <div class="overview-metric-item">
+              <div class="metric-top">
+                <span class="metric-label">MongoDB</span>
+                <span class="metric-status-badge badge-neutral" id="ovMongoBadge">Checking...</span>
+              </div>
+              <div class="metric-main-val" id="ovMongoVal">-- Runs</div>
+              <div class="metric-meta" id="ovMongoMeta" title="localhost:27017 • selfheal_db">localhost:27017 &bull; selfheal_db</div>
+            </div>
+
+            <!-- Available Scenarios -->
+            <div class="overview-metric-item">
+              <div class="metric-top">
+                <span class="metric-label">Scenarios</span>
+                <span class="metric-status-badge badge-heal">4 Core</span>
+              </div>
+              <div class="metric-main-val">4 Suites</div>
+              <div class="metric-meta" title="Baseline A, Drift B, Bug C, Math D">Baseline, Drift, Bug, Math</div>
+            </div>
+
+            <!-- Latest Run Status -->
+            <div class="overview-metric-item">
+              <div class="metric-top">
+                <span class="metric-label">Latest Run</span>
+                <span class="metric-status-badge badge-neutral" id="ovLatestRunBadge">Checking...</span>
+              </div>
+              <div class="metric-main-val" id="ovLatestRunVal">--</div>
+              <div class="metric-meta" id="ovLatestRunMeta" title="Run status from MongoDB">Loading run history...</div>
+            </div>
           </div>
         </div>
       </section>
 
       <!-- Problem vs Solution Comparison Section -->
-      <section class="section-container">
+      <section class="section-container" id="problem-solution-section">
         <div class="section-header">
-          <span class="section-tag">PARADIGM SHIFT</span>
+          <div class="section-tag-group">
+            <span class="section-tag">PARADIGM SHIFT</span>
+            <span class="tag-explanatory">Explanatory Comparison &bull; Not a Live Test Run</span>
+          </div>
           <h2>The Problem vs. The SelfHeal Solution</h2>
           <p>Why modern engineering teams waste hours fixing brittle test suites, and how intent-aware testing eliminates maintenance toil.</p>
         </div>
 
-        <div class="comparison-grid">
-          <!-- Left: Traditional Brittle Testing -->
-          <div class="comparison-card comp-fragile">
-            <div class="comp-badge badge-bug">Traditional Brittle Tests</div>
-            <h3>Fragile Selectors & Fixed Paths</h3>
-            <ul class="comp-list">
-              <li>
-                <strong>Rigid Locators:</strong> Bound to brittle selectors like <code class="code-inline">click("#checkout-btn")</code> or fragile XPath.
-              </li>
-              <li>
-                <strong>Breaks on Harmless Redesign:</strong> Converting a single form into a multi-step wizard breaks the entire test suite.
-              </li>
-              <li>
-                <strong>Endless Engineering Maintenance:</strong> Teams spend hours repairing locator syntax instead of verifying business functionality.
-              </li>
-              <li>
-                <strong>Flaky & Opaque:</strong> Fails with generic <code class="code-inline">ElementNotFoundException</code> without root cause triage.
-              </li>
-            </ul>
+        <div class="interactive-comparison-explorer">
+          <!-- Accessible Scenario Selector Tabs -->
+          <div class="comparison-tabs" role="tablist" aria-label="Testing Architecture Comparisons">
+            <button type="button" class="comp-tab active" role="tab" id="tab-redesign" aria-selected="true" aria-controls="panel-comp" data-scenario="redesign">
+              <span class="tab-index">01</span>
+              <span class="tab-text">UI Redesign (Multi-Step Wizard)</span>
+            </button>
+            <button type="button" class="comp-tab" role="tab" id="tab-locators" aria-selected="false" aria-controls="panel-comp" data-scenario="locators">
+              <span class="tab-index">02</span>
+              <span class="tab-text">Renamed Locators &amp; Attributes</span>
+            </button>
+            <button type="button" class="comp-tab" role="tab" id="tab-defects" aria-selected="false" aria-controls="panel-comp" data-scenario="defects">
+              <span class="tab-index">03</span>
+              <span class="tab-text">Genuine Server Defect (HTTP 500)</span>
+            </button>
           </div>
 
-          <!-- Right: SelfHeal Autonomous Testing -->
-          <div class="comparison-card comp-selfheal">
-            <div class="comp-badge badge-pass">SelfHeal Intent Architecture</div>
-            <h3>Immutable Goals & Adaptive Workflows</h3>
-            <ul class="comp-list">
-              <li>
-                <strong>Immutable Intent Contract:</strong> Test specifies business goal (<code class="code-inline">"Complete checkout with a valid credit card"</code>) and invariants.
-              </li>
-              <li>
-                <strong>Autonomous Workflow Reconstruction:</strong> Detects UI drift, discovers new wizard pages, and reconstructs the full multi-step path.
-              </li>
-              <li>
-                <strong>Strict Defect Classification:</strong> Rule engine identifies genuine bugs (HTTP 500, math errors) and refuses to falsely heal them.
-              </li>
-              <li>
-                <strong>Clean Replay Verification:</strong> Re-executes the rebuilt recipe from scratch in an isolated browser session. The AI never decides pass/fail.
-              </li>
-            </ul>
+          <!-- Side-by-Side Dynamic Panels -->
+          <div class="comparison-display" id="panel-comp" role="tabpanel" aria-labelledby="tab-redesign">
+            <!-- Left: Traditional Brittle Testing -->
+            <div class="comparison-card comp-fragile">
+              <div class="comp-card-header">
+                <div>
+                  <span class="badge badge-bug" id="compFragileBadge">FRAGILE EXECUTION</span>
+                  <h3 class="comp-card-title" id="compFragileTitle">Single-Page Script Breaks</h3>
+                </div>
+              </div>
+              <div class="comp-code-snippet" id="compFragileCode">// Traditional Playwright/Cypress script
+await page.click('#checkout-btn');
+await page.fill('#card-input', cardNum);
+// Error: Element not found or hidden on Step 1 of wizard!</div>
+              <ul class="comp-points-list" id="compFragilePoints">
+                <li><strong>Rigid Linear Path:</strong> Hardcoded to single-page flow; fails immediately when checkout splits into 4 sub-pages.</li>
+                <li><strong>Pipeline Stoppage:</strong> Blocked build requiring manual script rewrites across cart, shipping, payment, and review steps.</li>
+                <li><strong>High Engineering Toil:</strong> Developers spend hours updating locators rather than building business features.</li>
+              </ul>
+            </div>
+
+            <!-- Right: SelfHeal Autonomous Testing -->
+            <div class="comparison-card comp-selfheal">
+              <div class="comp-card-header">
+                <div>
+                  <span class="badge badge-pass" id="compSelfhealBadge">AUTONOMOUS RECONSTRUCTION</span>
+                  <h3 class="comp-card-title" id="compSelfhealTitle">Intent-Driven Multi-Step Adaptation</h3>
+                </div>
+              </div>
+              <div class="comp-code-snippet" id="compSelfhealCode">// SelfHeal Intent Architecture
+AOM UI Drift Detected -> Deep Agent plans 10 validated steps
+Clean replay executes in fresh browser -> Invariants pass
+Recipe v2 automatically saved to MongoDB</div>
+              <ul class="comp-points-list" id="compSelfhealPoints">
+                <li><strong>Immutable Intent Contract:</strong> Test targets the verified goal ("Complete checkout with valid card") without rigid page assumptions.</li>
+                <li><strong>Multi-Step Reconstruction:</strong> Deep Agent navigates wizard pages, fills required fields, and validates accessible names.</li>
+                <li><strong>Deterministic Replay:</strong> Clean replay verifies order confirmation and math invariants from scratch. The AI never declares pass/fail.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="comparison-footer-hint">
+            <span>The scenarios above demonstrate architectural differences. To run live automated browser workflows, use the verification suites below.</span>
+            <a href="/demo" class="btn btn-secondary btn-sm">Explore Interactive Demo &rarr;</a>
           </div>
         </div>
       </section>
 
-      <!-- The 4 Demonstration Scenarios -->
-      <section class="section-container">
+      <!-- Feature 1: Interactive Testing Lab -->
+      <section class="section-container" id="scenarios-section">
         <div class="section-header">
-          <span class="section-tag">VERIFICATION SCENARIOS</span>
-          <h2>4 Live Verification Scenarios</h2>
-          <p>Explore the four distinct scenarios implemented to prove the core requirements of the problem statement.</p>
+          <span class="section-tag">FEATURE 1: INTERACTIVE TESTING LAB</span>
+          <h2>Interactive Testing Lab: 4 Verification Scenarios</h2>
+          <p>Explore what each verification scenario tests, inspect deterministic business invariants, and launch live execution runs across all benchmark suites.</p>
         </div>
 
-        <div class="scenarios-grid">
-          <div class="scenario-card">
-            <div class="scenario-top">
+        <!-- Filter Controls -->
+        <div class="scenario-filter-bar">
+          <div class="filter-pills" role="radiogroup" aria-label="Filter scenarios by outcome">
+            <button type="button" class="filter-pill active" data-filter="all" aria-checked="true">All Scenarios (4)</button>
+            <button type="button" class="filter-pill" data-filter="pass" aria-checked="false">Passing &amp; Healing (2)</button>
+            <button type="button" class="filter-pill" data-filter="bug" aria-checked="false">Defect Rejection (2)</button>
+          </div>
+          <div class="filter-count-label" id="scenarioFilterCount">Showing 4 of 4 verification suites</div>
+        </div>
+
+        <!-- Selectable Scenario Grid -->
+        <div class="scenario-selector-grid" id="scenarioSelectorGrid">
+          <!-- Version A -->
+          <div class="scenario-interactive-card selected" role="button" tabindex="0" data-version="a" data-category="pass" aria-selected="true" id="scCardA">
+            <div class="scenario-card-header">
               <span class="badge badge-pass">PASS_NO_HEAL</span>
               <span class="scenario-tag">Version A</span>
             </div>
-            <h4>1. Passing Baseline</h4>
-            <p>Single-page checkout form. Recipe v1 executes cleanly in the browser. Verifier passes invariants with exactly <strong>zero LLM calls</strong>.</p>
-            <a href="/demo?run=a" class="scenario-link">Run Version A in Demo &rarr;</a>
+            <h4 class="scenario-card-title">1. Passing Baseline</h4>
+            <p class="scenario-card-desc">Single-page checkout form. Recipe v1 executes cleanly in the browser. Zero LLM calls invoked.</p>
+            <a href="/demo?run=a" class="scenario-direct-link" onclick="event.stopPropagation()">Run Version A &rarr;</a>
           </div>
 
-          <div class="scenario-card">
-            <div class="scenario-top">
+          <!-- Version B -->
+          <div class="scenario-interactive-card" role="button" tabindex="0" data-version="b" data-category="pass" aria-selected="false" id="scCardB">
+            <div class="scenario-card-header">
               <span class="badge badge-heal">PASS_AFTER_HEAL</span>
               <span class="scenario-tag">Version B</span>
             </div>
-            <h4>2. UI Redesign & Auto-Heal</h4>
-            <p>Application redesigned from single page to a 4-step wizard. SelfHeal detects UI drift, reconstructs 10 validated actions, and saves <strong>Recipe v2</strong>.</p>
-            <a href="/demo?run=b" class="scenario-link">Run Version B in Demo &rarr;</a>
+            <h4 class="scenario-card-title">2. UI Redesign &amp; Auto-Heal</h4>
+            <p class="scenario-card-desc">Redesigned to a 4-step wizard. SelfHeal detects UI drift, reconstructs 10 actions, and saves Recipe v2.</p>
+            <a href="/demo?run=b" class="scenario-direct-link" onclick="event.stopPropagation()">Run Version B &rarr;</a>
           </div>
 
-          <div class="scenario-card">
-            <div class="scenario-top">
+          <!-- Version C -->
+          <div class="scenario-interactive-card" role="button" tabindex="0" data-version="c" data-category="bug" aria-selected="false" id="scCardC">
+            <div class="scenario-card-header">
               <span class="badge badge-bug">FAIL_FUNCTIONAL</span>
               <span class="scenario-tag">Version C</span>
             </div>
-            <h4>3. Server Defect Defense</h4>
-            <p>Checkout form throws an HTTP 500 internal server error alert. Rule engine classifies <strong>APP_BUG</strong> and strictly refuses to heal, catching the bug.</p>
-            <a href="/demo?run=c" class="scenario-link">Run Version C in Demo &rarr;</a>
+            <h4 class="scenario-card-title">3. Server Defect Defense</h4>
+            <p class="scenario-card-desc">Checkout form throws HTTP 500 alert. Rule engine classifies APP_BUG and strictly refuses to heal.</p>
+            <a href="/demo?run=c" class="scenario-direct-link" onclick="event.stopPropagation()">Run Version C &rarr;</a>
           </div>
 
-          <div class="scenario-card">
-            <div class="scenario-top">
+          <!-- Version D -->
+          <div class="scenario-interactive-card" role="button" tabindex="0" data-version="d" data-category="bug" aria-selected="false" id="scCardD">
+            <div class="scenario-card-header">
               <span class="badge badge-bug">FAIL_FUNCTIONAL</span>
               <span class="scenario-tag">Version D</span>
             </div>
-            <h4>4. Invariant Math Defect</h4>
-            <p>Order completes, but the final total calculation displays $32.50 instead of $36.50. Deterministic verifier catches the invariant mismatch.</p>
-            <a href="/demo?run=d" class="scenario-link">Run Version D in Demo &rarr;</a>
+            <h4 class="scenario-card-title">4. Invariant Math Defect</h4>
+            <p class="scenario-card-desc">Order completes, but total displays $32.50 instead of $36.50. Deterministic verifier catches mismatch.</p>
+            <a href="/demo?run=d" class="scenario-direct-link" onclick="event.stopPropagation()">Run Version D &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Detailed Scenario Inspection Drawer Panel -->
+        <div class="scenario-detail-panel" id="scenarioDetailPanel">
+          <div class="detail-panel-header">
+            <div class="detail-header-left">
+              <span class="badge badge-pass" id="detailPanelBadge">PASS_NO_HEAL</span>
+              <h3 class="detail-panel-title" id="detailPanelTitle">Scenario Specification: Version A (Passing Baseline)</h3>
+            </div>
+            <div class="detail-header-right">
+              <span class="scenario-tag" id="detailPanelTag">Single-Page Flow</span>
+            </div>
+          </div>
+
+          <div class="detail-grid">
+            <div class="detail-item-box">
+              <div class="detail-item-label">Target Behavior</div>
+              <div class="detail-item-text" id="detailTargetBehavior">
+                Standard single-page checkout form with Name, Email, Address, Card, Expiry, and CVC fields. Submits cleanly to confirmation.
+              </div>
+            </div>
+
+            <div class="detail-item-box">
+              <div class="detail-item-label">Expected Verdict &amp; Rule</div>
+              <div class="detail-item-text" id="detailExpectedVerdict">
+                <strong>PASS_NO_HEAL:</strong> Baseline recipe v1 succeeds. Rule 5 asserts zero LLM calls on passing baseline.
+              </div>
+            </div>
+
+            <div class="detail-item-box">
+              <div class="detail-item-label">Target Endpoint</div>
+              <div class="detail-item-text" id="detailTargetEndpoint">
+                <code class="code-inline">http://127.0.0.1:5000/v/a/</code>
+              </div>
+            </div>
+
+            <div class="detail-item-box">
+              <div class="detail-item-label">MongoDB Run Status</div>
+              <div class="detail-item-text" id="detailMongoStatus">
+                Checking recorded runs in MongoDB...
+              </div>
+            </div>
+
+            <div class="detail-item-box" style="grid-column: 1 / -1;">
+              <div class="detail-item-label">Verified Business Invariants</div>
+              <div class="detail-item-text" id="detailInvariants">
+                <!-- Populated dynamically by JS -->
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-actions-bar">
+            <div>
+              <span class="text-secondary" style="font-size: 12px;">Deterministic verification strictly enforced by engine/verifier.py</span>
+            </div>
+            <div class="detail-actions-right">
+              <a href="http://127.0.0.1:5000/v/a/" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" id="btnDetailInspect">Inspect Target Page (:5000) &nearr;</a>
+              <a href="/demo?run=a" class="btn btn-primary btn-sm" id="btnDetailRun">Launch Version A in Demo &rarr;</a>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- Core Architectural Pillars -->
-      <section class="section-container">
+      <!-- Feature 2: UI Drift Visualizer -->
+      <section class="section-container" id="drift-visualizer-section">
+        <div class="section-header">
+          <div class="section-tag-group" style="justify-content: center;">
+            <span class="section-tag">FEATURE 2: UI DRIFT VISUALIZER</span>
+            <span class="tag-explanatory">Authentic Architectural Drift Comparison</span>
+          </div>
+          <h2>UI Drift Visualizer: Single-Page vs. Multi-Step Wizard</h2>
+          <p>Visually compare how SelfHeal responds when an interface undergoes a major redesign from Version A (single-page form) to Version B (4-step wizard).</p>
+        </div>
+
+        <!-- Interactive View Controls & Step Navigator -->
+        <div class="drift-controls-bar">
+          <div class="drift-view-pills" role="radiogroup" aria-label="Select visualizer comparison layout">
+            <span class="drift-ctrl-label">Layout View:</span>
+            <button type="button" class="drift-pill active" id="btnViewSideBySide" data-view="side-by-side" aria-checked="true">Side-by-Side Comparison</button>
+            <button type="button" class="drift-pill" id="btnViewVersionA" data-view="version-a" aria-checked="false">Version A (Original UI)</button>
+            <button type="button" class="drift-pill" id="btnViewVersionB" data-view="version-b" aria-checked="false">Version B (Redesigned UI)</button>
+          </div>
+
+          <div class="drift-step-pills" id="stepNavigator" role="radiogroup" aria-label="Navigate Version B wizard steps">
+            <span class="drift-ctrl-label">Wizard Step:</span>
+            <button type="button" class="drift-pill active" data-step="1" id="stepCartPill" aria-checked="true">1. Cart</button>
+            <button type="button" class="drift-pill" data-step="2" id="stepShippingPill" aria-checked="false">2. Shipping</button>
+            <button type="button" class="drift-pill" data-step="3" id="stepPaymentPill" aria-checked="false">3. Payment</button>
+            <button type="button" class="drift-pill" data-step="4" id="stepReviewPill" aria-checked="false">4. Review</button>
+          </div>
+        </div>
+
+        <!-- Comparison Cards Display Grid -->
+        <div class="drift-comparison-grid" id="driftComparisonGrid">
+          <!-- Left: Version A (Baseline) -->
+          <div class="drift-card" id="driftOriginalCard">
+            <div class="drift-card-header">
+              <div>
+                <h3 class="drift-card-title">Original Interface (Version A)</h3>
+                <div class="drift-card-subtitle">Single-Page Checkout Form &bull; <code>http://127.0.0.1:5000/v/a/</code></div>
+              </div>
+              <span class="badge badge-pass">BASELINE ARCHITECTURE</span>
+            </div>
+
+            <!-- Wireframe Mockup -->
+            <div class="drift-mockup-frame">
+              <div class="mockup-header-bar">
+                <span>Viewport: /v/a/ (Single Page)</span>
+                <span>Cart Total: $36.50</span>
+              </div>
+              <div class="mockup-fields-flow">
+                <div class="mockup-field-row">
+                  <span>Customer Name Field</span>
+                  <span class="mockup-field-tag">input#name</span>
+                </div>
+                <div class="mockup-field-row">
+                  <span>Email Address Field</span>
+                  <span class="mockup-field-tag">input#email</span>
+                </div>
+                <div class="mockup-field-row">
+                  <span>Shipping Address Field</span>
+                  <span class="mockup-field-tag">input#address</span>
+                </div>
+                <div class="mockup-field-row">
+                  <span>Card Number, Expiry, CVC</span>
+                  <span class="mockup-field-tag">input#card, #exp, #cvc</span>
+                </div>
+                <div class="mockup-field-row" style="background: var(--mono-offwhite); font-weight: 600;">
+                  <span>Submit Action: Place Order</span>
+                  <span class="mockup-field-tag">button#checkout-button</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Brittle Script Failure Explanation -->
+            <div class="drift-code-box">
+<span style="color: var(--mono-gray);">// Traditional Brittle Test Script (Hardcoded Selectors)</span>
+<span style="color: var(--mono-white);">await page.click('#checkout-button');</span>
+<span style="color: var(--mono-white);">await page.fill('#card-input', cardNum);</span>
+<span style="color: var(--mono-silver); font-style: italic;">// &cross; Breaks immediately on redesign:</span>
+<span style="color: var(--mono-silver); font-style: italic;">// '#checkout-button' is missing from step 1.</span>
+<span style="color: var(--mono-silver); font-style: italic;">// Card fields are hidden until step 3.</span>
+<span style="color: var(--mono-silver); font-style: italic;">// Pipeline blocked: requires manual script rewrite.</span>
+            </div>
+
+            <ul class="drift-analysis-list">
+              <li><strong>Rigid Linear Assumptions:</strong> Script assumes all input fields reside on a single DOM document.</li>
+              <li><strong>Coupled to CSS Identifiers:</strong> Fails when developers rename classes, IDs, or element nesting hierarchy.</li>
+              <li><strong>High Maintenance Overhead:</strong> 80%+ of E2E test suite maintenance is caused by locator drift rather than genuine software bugs.</li>
+            </ul>
+          </div>
+
+          <!-- Right: Version B (Redesigned Wizard) -->
+          <div class="drift-card" id="driftRedesignedCard">
+            <div class="drift-card-header">
+              <div>
+                <h3 class="drift-card-title">Redesigned Interface (Version B)</h3>
+                <div class="drift-card-subtitle" id="redesignedSubtitle">4-Step Wizard &bull; <code>http://127.0.0.1:5000/v/b/</code></div>
+              </div>
+              <span class="badge badge-heal">AUTONOMOUSLY HEALED</span>
+            </div>
+
+            <!-- Dynamic Wizard Step Mockup -->
+            <div class="drift-mockup-frame">
+              <div class="mockup-step-indicator" id="mockupStepBadges">
+                <span class="mockup-step-badge active" data-step-badge="1">1. Cart</span>
+                <span class="mockup-step-badge" data-step-badge="2">2. Shipping</span>
+                <span class="mockup-step-badge" data-step-badge="3">3. Payment</span>
+                <span class="mockup-step-badge" data-step-badge="4">4. Review</span>
+              </div>
+              <div class="mockup-header-bar">
+                <span id="wizardStepPath">Viewport: /v/b/ (Cart Overview)</span>
+                <span id="wizardStepTotal">Verified Total: $36.50</span>
+              </div>
+              <div class="mockup-fields-flow" id="wizardStepFields">
+                <!-- Dynamically updated by JS based on step -->
+              </div>
+            </div>
+
+            <!-- Intent-Aware Reconstruction Code -->
+            <div class="drift-code-box">
+<span style="color: var(--mono-gray);">// SelfHeal Intent-Aware Workflow Reconstruction</span>
+<span style="color: var(--mono-white);">// Intent: "Complete checkout with a valid credit card"</span>
+<span style="color: var(--mono-white);">1. AOM Snapshot discovers page progression: cart &rarr; shipping &rarr; payment &rarr; review</span>
+<span style="color: var(--mono-white);">2. Deep Agent maps immutable test-data keys to accessible names</span>
+<span style="color: var(--mono-white);">3. Proposes 10 deterministic actions; executes in fresh browser</span>
+<span style="color: var(--mono-silver); font-style: italic;">// &check; Invariants verify total ($36.50) &amp; confirmation phrase</span>
+<span style="color: var(--mono-silver); font-style: italic;">// &check; Recipe upgraded to v2. Zero human script intervention.</span>
+            </div>
+
+            <ul class="drift-analysis-list">
+              <li><strong>AOM Semantic Topology:</strong> SelfHeal reads accessibility tree roles (<code>textbox</code>, <code>button</code>) rather than CSS selector paths.</li>
+              <li><strong>Multi-Step Path Planning:</strong> Deep Agent navigates across intermediate wizard steps, filling required inputs on their respective pages.</li>
+              <li><strong>Zero Test Contract Drift:</strong> The test assertion and immutable intent stay 100% frozen; only the execution recipe evolves.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Architectural Principle Banner -->
+        <div class="drift-callout-banner">
+          <strong>The Intent Invariant Principle:</strong> A user's business intent (&ldquo;Complete checkout with valid payment&rdquo;) does not change when an engineering team splits a single checkout page into a 4-step wizard. By decoupling test contracts from volatile HTML markup, SelfHeal enables continuous deployment pipelines to survive major UI modernizations autonomously.
+        </div>
+      </section>
+
+      <!-- Feature 3: Failure Diagnosis Center -->
+      <section class="section-container" id="diagnosis-center-section">
+        <div class="section-header">
+          <div class="section-tag-group" style="justify-content: center;">
+            <span class="section-tag">FEATURE 3: FAILURE DIAGNOSIS CENTER</span>
+            <span class="tag-explanatory">Deterministic Root-Cause Triage</span>
+          </div>
+          <h2>Failure Diagnosis Center: Root-Cause Classification Engine</h2>
+          <p>Explore how SelfHeal deterministically separates recoverable UI redesigns from genuine application defects and execution flakiness before invoking AI healing.</p>
+        </div>
+
+        <!-- Classification Category Filters -->
+        <div class="diagnosis-filters-bar">
+          <div class="filter-pills" role="radiogroup" aria-label="Filter failure classifications by category">
+            <button type="button" class="filter-pill active" data-diag-filter="all" aria-checked="true">All Classifications (9)</button>
+            <button type="button" class="filter-pill" data-diag-filter="pass" aria-checked="false">Passing &amp; Recovered (2)</button>
+            <button type="button" class="filter-pill" data-diag-filter="defect" aria-checked="false">Application Defects (3)</button>
+            <button type="button" class="filter-pill" data-diag-filter="safety" aria-checked="false">Safety &amp; Guardrails (4)</button>
+          </div>
+          <div class="filter-count-label" id="diagFilterCount">Showing 9 of 9 system verdicts</div>
+        </div>
+
+        <!-- Selectable Classifications Grid -->
+        <div class="diagnosis-grid" id="diagGrid">
+          <!-- 1. PASS_NO_HEAL -->
+          <div class="diagnosis-card selected" role="button" tabindex="0" data-code="PASS_NO_HEAL" data-diag-cat="pass" aria-selected="true">
+            <div class="diag-card-top">
+              <span class="badge badge-pass">PASS_NO_HEAL</span>
+              <span class="diag-card-rule">Rule 5: Zero LLM</span>
+            </div>
+            <div class="diag-card-title">Passing Baseline</div>
+            <div class="diag-card-desc">Baseline recipe executed cleanly with all invariants satisfied. Zero LLM calls invoked.</div>
+          </div>
+
+          <!-- 2. PASS_AFTER_HEAL -->
+          <div class="diagnosis-card" role="button" tabindex="0" data-code="PASS_AFTER_HEAL" data-diag-cat="pass" aria-selected="false">
+            <div class="diag-card-top">
+              <span class="badge badge-heal">PASS_AFTER_HEAL</span>
+              <span class="diag-card-rule">Rule 2: UI Drift</span>
+            </div>
+            <div class="diag-card-title">UI Drift Auto-Healed</div>
+            <div class="diag-card-desc">UI drift diagnosed, multi-step recipe reconstructed, and clean replay verified in fresh context.</div>
+          </div>
+
+          <!-- 3. FAIL_FUNCTIONAL -->
+          <div class="diagnosis-card" role="button" tabindex="0" data-code="FAIL_FUNCTIONAL" data-diag-cat="defect" aria-selected="false">
+            <div class="diag-card-top">
+              <span class="badge badge-bug">FAIL_FUNCTIONAL</span>
+              <span class="diag-card-rule">Rules 1 &amp; 3: APP_BUG</span>
+            </div>
+            <div class="diag-card-title">Genuine Application Defect</div>
+            <div class="diag-card-desc">Application broken (HTTP 500, error alert, math invariant mismatch). AI healing strictly refused.</div>
+          </div>
+
+          <!-- 4. FAIL_HEALING -->
+          <div class="diagnosis-card" role="button" tabindex="0" data-code="FAIL_HEALING" data-diag-cat="defect" aria-selected="false">
+            <div class="diag-card-top">
+              <span class="badge badge-bug">FAIL_HEALING</span>
+              <span class="diag-card-rule">Limit Exhausted</span>
+            </div>
+            <div class="diag-card-title">Healing Unresolved</div>
+            <div class="diag-card-desc">Agent reached 10-step or recursion limit without discovering valid path. No app bug detected.</div>
+          </div>
+
+          <!-- 5. FAIL_EXECUTION -->
+          <div class="diagnosis-card" role="button" tabindex="0" data-code="FAIL_EXECUTION" data-diag-cat="safety" aria-selected="false">
+            <div class="diag-card-top">
+              <span class="badge badge-neutral">FAIL_EXECUTION</span>
+              <span class="diag-card-rule">Rule 4: Flaky Retry</span>
+            </div>
+            <div class="diag-card-title">Infrastructure / Timeout</div>
+            <div class="diag-card-desc">Browser context crash or network timeout that persisted across clean retry.</div>
+          </div>
+
+          <!-- 6. NEEDS_REVIEW -->
+          <div class="diagnosis-card" role="button" tabindex="0" data-code="NEEDS_REVIEW" data-diag-cat="safety" aria-selected="false">
+            <div class="diag-card-top">
+              <span class="badge badge-neutral">NEEDS_REVIEW</span>
+              <span class="diag-card-rule">Rule 5: Ambiguity</span>
+            </div>
+            <div class="diag-card-title">Human Review Required</div>
+            <div class="diag-card-desc">Ambiguous accessible elements (multiple matching buttons) or low confidence proposal.</div>
+          </div>
+
+          <!-- 7. BLOCKED_CONFIG -->
+          <div class="diagnosis-card" role="button" tabindex="0" data-code="BLOCKED_CONFIG" data-diag-cat="safety" aria-selected="false">
+            <div class="diag-card-top">
+              <span class="badge badge-neutral">BLOCKED_CONFIG</span>
+              <span class="diag-card-rule">Safety Guard</span>
+            </div>
+            <div class="diag-card-title">Missing Configuration</div>
+            <div class="diag-card-desc">Missing API key, origin allowlist violation, or model setting missing. AI halts safely.</div>
+          </div>
+
+          <!-- 8. BLOCKED_AGENT -->
+          <div class="diagnosis-card" role="button" tabindex="0" data-code="BLOCKED_AGENT" data-diag-cat="safety" aria-selected="false">
+            <div class="diag-card-top">
+              <span class="badge badge-neutral">BLOCKED_AGENT</span>
+              <span class="diag-card-rule">Safety Guard</span>
+            </div>
+            <div class="diag-card-title">Agent API Failure</div>
+            <div class="diag-card-desc">LLM API rate limit or model transport error during healing execution. Never fakes success.</div>
+          </div>
+
+          <!-- 9. FAIL_BASELINE -->
+          <div class="diagnosis-card" role="button" tabindex="0" data-code="FAIL_BASELINE" data-diag-cat="defect" aria-selected="false">
+            <div class="diag-card-top">
+              <span class="badge badge-bug">FAIL_BASELINE</span>
+              <span class="diag-card-rule">Contract Guard</span>
+            </div>
+            <div class="diag-card-title">Untrusted Baseline</div>
+            <div class="diag-card-desc">Version A failed on initial execution. No baseline inventory or recipe is trusted.</div>
+          </div>
+        </div>
+
+        <!-- Detailed Diagnosis Inspection Panel -->
+        <div class="diagnosis-detail-panel" id="diagDetailPanel">
+          <div class="diag-detail-header">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span class="badge badge-pass" id="diagDetailBadge">PASS_NO_HEAL</span>
+              <h3 class="detail-panel-title" id="diagDetailTitle">Diagnosis: PASS_NO_HEAL (Baseline Passing)</h3>
+            </div>
+            <span class="scenario-tag" id="diagDetailCategory">Outcome: Passing Baseline</span>
+          </div>
+
+          <div class="diag-detail-grid">
+            <div class="diag-detail-box">
+              <div class="diag-detail-box-label">Deterministic Triage Rule</div>
+              <div class="diag-detail-box-val" id="diagDetailRule">
+                <strong>engine/classifier.py Rule 5:</strong> Recipe v1 executes cleanly. Deterministic verifier invariants pass. Rule 5 guarantees zero LLM calls on passing baselines.
+              </div>
+            </div>
+
+            <div class="diag-detail-box">
+              <div class="diag-detail-box-label">System Action &amp; Safety Response</div>
+              <div class="diag-detail-box-val" id="diagDetailSafety">
+                <strong>Status Computation by Code:</strong> AI is never invoked. Recipe stays version 1. Fast execution with zero cost or hallucination risk.
+              </div>
+            </div>
+
+            <div class="diag-detail-box">
+              <div class="diag-detail-box-label">Relevant Failure Types Handled</div>
+              <div class="diag-detail-box-val" id="diagDetailTypes">
+                <code>NONE (All steps succeeded)</code>
+              </div>
+            </div>
+
+            <div class="diag-detail-box">
+              <div class="diag-detail-box-label">MongoDB Execution Evidence</div>
+              <div class="diag-detail-box-val" id="diagDetailEvidence">
+                Inspecting recorded run status in MongoDB audit history...
+              </div>
+            </div>
+          </div>
+
+          <!-- Zero False Healing Guarantee Callout -->
+          <div class="zero-false-healing-box">
+            <div style="font-size: 20px; font-weight: bold; line-height: 1;">&check;</div>
+            <div>
+              <div class="zero-false-healing-title">Zero False-Healing Guarantee (Integrity Rule 1 &amp; Rule 6)</div>
+              <div class="zero-false-healing-desc">
+                Traditional AI tools frequently &ldquo;heal&rdquo; tests by clicking dismiss on error alerts or finding alternate paths when backend services crash. SelfHeal strictly forbids this: Rule 1 classifies <code>APP_BUG</code> immediately upon HTTP 5xx or calculation mismatches, halting the agent before it can propose a single step.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Core Architectural Pillars / Engineering Guardrails -->
+      <section class="section-container" id="principles-section">
         <div class="section-header">
           <span class="section-tag">ENGINEERING INTEGRITY</span>
-          <h2>Core System Principles</h2>
+          <h2>Core System Principles &amp; Guardrails</h2>
           <p>Built with strict constraints to ensure automated testing is safe, predictable, and enterprise-ready.</p>
         </div>
 
-        <div class="pillars-grid">
-          <div class="pillar-card">
-            <h4>Immutable Intent</h4>
-            <p>The goal and invariants are cryptographically hashed. The agent can never modify test criteria or expectations to force a pass.</p>
+        <!-- Guardrails Controls -->
+        <div class="guardrails-controls">
+          <div class="guardrail-categories" role="radiogroup" aria-label="Filter principles by category">
+            <button type="button" class="guardrail-cat-pill active" data-cat="all" aria-checked="true">All Guardrails (6)</button>
+            <button type="button" class="guardrail-cat-pill" data-cat="integrity" aria-checked="false">Test Integrity</button>
+            <button type="button" class="guardrail-cat-pill" data-cat="verification" aria-checked="false">Verification &amp; Outcomes</button>
+            <button type="button" class="guardrail-cat-pill" data-cat="safety" aria-checked="false">Agent Safety &amp; Security</button>
+            <button type="button" class="guardrail-cat-pill" data-cat="persistence" aria-checked="false">Audit &amp; Persistence</button>
+          </div>
+          <div class="guardrail-search-box">
+            <svg class="guardrail-search-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="search" id="guardrailSearch" placeholder="Search guardrails or code files..." class="guardrail-search-input" aria-label="Search guardrails">
+          </div>
+        </div>
+
+        <div class="guardrails-grid" id="guardrailsGrid">
+          <!-- Principle 1 -->
+          <div class="guardrail-card" data-cat="integrity" data-keywords="immutable intent hash test criteria expectations recipes.py checkout_intent.json">
+            <div class="guardrail-card-top">
+              <div class="guardrail-badge-row">
+                <span class="guardrail-cat-badge">Test Integrity</span>
+                <span class="metric-status-badge badge-pass">Rule 1</span>
+              </div>
+              <h4 class="guardrail-title">Immutable Intent</h4>
+              <p class="guardrail-summary">The goal and invariants are cryptographically hashed. The agent can never modify test criteria or expectations to force a pass.</p>
+            </div>
+            <button type="button" class="guardrail-expand-btn" aria-expanded="false" aria-controls="drawer-1">
+              <span>View Technical Safeguards</span>
+              <svg class="guardrail-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="guardrail-drawer" id="drawer-1" hidden>
+              <div>
+                <div class="drawer-section-title">What It Protects</div>
+                <div class="drawer-text">Prevents goal drift. The AI cannot weaken assertions, alter test data dictionaries, or change expected totals when a test encounters difficulty.</div>
+              </div>
+              <div>
+                <div class="drawer-section-title">Why It Matters</div>
+                <div class="drawer-text">Eliminates the dangerous failure mode where healing agents "pass" tests by deleting failing verification steps.</div>
+              </div>
+              <div>
+                <div class="drawer-section-title">Enforced In Repository</div>
+                <div class="drawer-text">
+                  <span class="drawer-code-ref">intents/checkout_intent.json</span>
+                  <span class="drawer-code-ref">engine/recipes.py (load_intent, compute_intent_hash)</span>
+                  <span class="drawer-code-ref">AGENTS.md (Global Rule 1)</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="pillar-card">
-            <h4>Deterministic Verifier</h4>
-            <p>AI models propose actions, but only deterministic code decides pass or fail during a from-scratch replay in a fresh browser session.</p>
+          <!-- Principle 2 -->
+          <div class="guardrail-card" data-cat="verification" data-keywords="deterministic verifier replay clean browser verifier.py orchestrator.py rule 5">
+            <div class="guardrail-card-top">
+              <div class="guardrail-badge-row">
+                <span class="guardrail-cat-badge">Verification &amp; Outcomes</span>
+                <span class="metric-status-badge badge-pass">Rule 5</span>
+              </div>
+              <h4 class="guardrail-title">Deterministic Verifier</h4>
+              <p class="guardrail-summary">AI models propose actions, but only deterministic code decides pass or fail during a from-scratch replay in a fresh browser session.</p>
+            </div>
+            <button type="button" class="guardrail-expand-btn" aria-expanded="false" aria-controls="drawer-2">
+              <span>View Technical Safeguards</span>
+              <svg class="guardrail-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="guardrail-drawer" id="drawer-2" hidden>
+              <div>
+                <div class="drawer-section-title">What It Protects</div>
+                <div class="drawer-text">Protects against LLM hallucinations and confirmation bias. The agent has no tool or API that can declare a test pass.</div>
+              </div>
+              <div>
+                <div class="drawer-section-title">Why It Matters</div>
+                <div class="drawer-text">Strict mathematical and invariant checks (HTTP 200, confirmation order ID, total == $36.50) are evaluated purely in deterministic code.</div>
+              </div>
+              <div>
+                <div class="drawer-section-title">Enforced In Repository</div>
+                <div class="drawer-text">
+                  <span class="drawer-code-ref">engine/verifier.py (verify_outcome)</span>
+                  <span class="drawer-code-ref">engine/orchestrator.py (_verify_and_finalize)</span>
+                  <span class="drawer-code-ref">AGENTS.md (Global Rule 5)</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="pillar-card">
-            <h4>No Generated Scripts</h4>
-            <p>No LLM-generated Python, JavaScript, shell, eval, or exec. The model proposes strictly typed semantic actions validated before execution.</p>
+          <!-- Principle 3 -->
+          <div class="guardrail-card" data-cat="safety" data-keywords="no generated scripts validator.py actions.py rce code execution eval exec rule 3">
+            <div class="guardrail-card-top">
+              <div class="guardrail-badge-row">
+                <span class="guardrail-cat-badge">Agent Safety &amp; Security</span>
+                <span class="metric-status-badge badge-pass">Rule 3</span>
+              </div>
+              <h4 class="guardrail-title">No Generated Scripts</h4>
+              <p class="guardrail-summary">No LLM-generated Python, JavaScript, shell, eval, or exec. The model proposes strictly typed semantic actions validated before execution.</p>
+            </div>
+            <button type="button" class="guardrail-expand-btn" aria-expanded="false" aria-controls="drawer-3">
+              <span>View Technical Safeguards</span>
+              <svg class="guardrail-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="guardrail-drawer" id="drawer-3" hidden>
+              <div>
+                <div class="drawer-section-title">What It Protects</div>
+                <div class="drawer-text">Completely mitigates Remote Code Execution (RCE) and Prompt Injection attacks from untrusted third-party web content.</div>
+              </div>
+              <div>
+                <div class="drawer-section-title">Why It Matters</div>
+                <div class="drawer-text">Allowed actions are limited to: <code class="code-inline">goto_start</code>, <code class="code-inline">fill_field</code>, and <code class="code-inline">click_button</code>. Every proposed action is schema-validated.</div>
+              </div>
+              <div>
+                <div class="drawer-section-title">Enforced In Repository</div>
+                <div class="drawer-text">
+                  <span class="drawer-code-ref">engine/validator.py (validate_step_proposal)</span>
+                  <span class="drawer-code-ref">engine/actions.py (resolve_target)</span>
+                  <span class="drawer-code-ref">AGENTS.md (Global Rule 3 &amp; 4)</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="pillar-card">
-            <h4>Local MongoDB Persistence</h4>
-            <p>Every execution, UI diff, triage diagnosis, and versioned recipe (<code class="code-inline">v1</code> &rarr; <code class="code-inline">v2</code>) is logged with complete cryptographic lineage.</p>
+          <!-- Principle 4 -->
+          <div class="guardrail-card" data-cat="persistence" data-keywords="mongodb persistence audit lineage db.py recipes.py runs v1 v2">
+            <div class="guardrail-card-top">
+              <div class="guardrail-badge-row">
+                <span class="guardrail-cat-badge">Audit &amp; Persistence</span>
+                <span class="metric-status-badge badge-pass">Rule 17</span>
+              </div>
+              <h4 class="guardrail-title">Local MongoDB Persistence</h4>
+              <p class="guardrail-summary">Every execution, UI diff, triage diagnosis, and versioned recipe (v1 &rarr; v2) is logged with complete cryptographic lineage.</p>
+            </div>
+            <button type="button" class="guardrail-expand-btn" aria-expanded="false" aria-controls="drawer-4">
+              <span>View Technical Safeguards</span>
+              <svg class="guardrail-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="guardrail-drawer" id="drawer-4" hidden>
+              <div>
+                <div class="drawer-section-title">What It Protects</div>
+                <div class="drawer-text">Guarantees full auditability and reproducible history. No recipe can be promoted without recorded run verification.</div>
+              </div>
+              <div>
+                <div class="drawer-section-title">Why It Matters</div>
+                <div class="drawer-text">Enterprise engineering teams can inspect timeline traces, exact AOM differences, and triage evidence for every healed test.</div>
+              </div>
+              <div>
+                <div class="drawer-section-title">Enforced In Repository</div>
+                <div class="drawer-text">
+                  <span class="drawer-code-ref">webapp/db.py (MongoDBManager)</span>
+                  <span class="drawer-code-ref">engine/recipes.py (save_recipe version increments)</span>
+                  <span class="drawer-code-ref">MongoDB Collections: runs, recipes, contacts</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="pillar-card">
-            <h4>Origin Allowlist Guard</h4>
-            <p>Strict network routing ensures the browser automation visits only registered, allowlisted target endpoints (<code class="code-inline">:5000</code>).</p>
+          <!-- Principle 5 -->
+          <div class="guardrail-card" data-cat="safety" data-keywords="origin allowlist ssrf browser.py config.py port 5000 network security rule 9 19">
+            <div class="guardrail-card-top">
+              <div class="guardrail-badge-row">
+                <span class="guardrail-cat-badge">Agent Safety &amp; Security</span>
+                <span class="metric-status-badge badge-pass">Rule 9 &amp; 19</span>
+              </div>
+              <h4 class="guardrail-title">Origin Allowlist Guard</h4>
+              <p class="guardrail-summary">Strict network routing ensures the browser automation visits only registered, allowlisted target endpoints (:5000).</p>
+            </div>
+            <button type="button" class="guardrail-expand-btn" aria-expanded="false" aria-controls="drawer-5">
+              <span>View Technical Safeguards</span>
+              <svg class="guardrail-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="guardrail-drawer" id="drawer-5" hidden>
+              <div>
+                <div class="drawer-section-title">What It Protects</div>
+                <div class="drawer-text">Strict SSRF guard. Blocks navigation to cloud metadata endpoints (169.254.169.254), private ranges, and non-allowlisted domains.</div>
+              </div>
+              <div>
+                <div class="drawer-section-title">Why It Matters</div>
+                <div class="drawer-text">Guarantees that autonomous browser sessions cannot be weaponized or redirected to internal networks or external third parties.</div>
+              </div>
+              <div>
+                <div class="drawer-section-title">Enforced In Repository</div>
+                <div class="drawer-text">
+                  <span class="drawer-code-ref">engine/browser.py (BrowserSession route guard)</span>
+                  <span class="drawer-code-ref">engine/config.py (ALLOWED_ORIGINS)</span>
+                  <span class="drawer-code-ref">AGENTS.md (Global Rule 9 &amp; 19)</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="pillar-card">
-            <h4>AOM Accessibility Snapshots</h4>
-            <p>Structural comparisons rely on accessible names, roles, and headings. Sensitive passwords and credit card inputs are never stored.</p>
+          <!-- Principle 6 -->
+          <div class="guardrail-card" data-cat="integrity" data-keywords="aom accessibility snapshot snapshot.py diff.py pii credit card secrets rule 4 10">
+            <div class="guardrail-card-top">
+              <div class="guardrail-badge-row">
+                <span class="guardrail-cat-badge">Test Integrity</span>
+                <span class="metric-status-badge badge-pass">Rule 4 &amp; 10</span>
+              </div>
+              <h4 class="guardrail-title">AOM Accessibility Snapshots</h4>
+              <p class="guardrail-summary">Structural comparisons rely on accessible names, roles, and headings. Sensitive passwords and credit card inputs are never stored.</p>
+            </div>
+            <button type="button" class="guardrail-expand-btn" aria-expanded="false" aria-controls="drawer-6">
+              <span>View Technical Safeguards</span>
+              <svg class="guardrail-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="guardrail-drawer" id="drawer-6" hidden>
+              <div>
+                <div class="drawer-section-title">What It Protects</div>
+                <div class="drawer-text">Zero secret leakage. The agent operates on semantic Accessible Object Models (AOM) rather than raw DOM dumps with sensitive user data.</div>
+              </div>
+              <div>
+                <div class="drawer-section-title">Why It Matters</div>
+                <div class="drawer-text">Reduces token overhead by 85% compared to raw HTML while ensuring card numbers and passwords never enter model contexts or baseline files.</div>
+              </div>
+              <div>
+                <div class="drawer-section-title">Enforced In Repository</div>
+                <div class="drawer-text">
+                  <span class="drawer-code-ref">engine/snapshot.py (build_aom_snapshot)</span>
+                  <span class="drawer-code-ref">engine/diff.py (compute_aom_diff)</span>
+                  <span class="drawer-code-ref">AGENTS.md (Global Rule 4 &amp; 10)</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -265,10 +2137,6 @@
           <p class="footer-desc">
             Intent-aware, autonomous end-to-end testing system that survives interface redesigns without modifying test contracts.
           </p>
-          <div class="footer-status-pill">
-            <span class="status-dot dot-live"></span>
-            <span>Local MongoDB: Connected (localhost:27017)</span>
-          </div>
         </div>
 
         <div class="footer-col">
@@ -276,7 +2144,6 @@
           <ul class="footer-links">
             <li><a href="/">Home</a></li>
             <li><a href="/demo">Interactive Studio Demo</a></li>
-            <li><a href="/about">Architecture & Global Rules</a></li>
             <li><a href="/contact">Contact & Feedback</a></li>
           </ul>
         </div>
@@ -310,13 +2177,815 @@
   </div>
 
   <script>
-    // Fetch live system status for header pill
-    fetch('/api/status').then(r => r.json()).then(data => {
-      const el = document.getElementById('mongoVal');
-      if (el && data.db && data.db.connected) {
-        el.textContent = `Live (${data.db.runs_count} runs)`;
+    // =========================================================================
+    // SelfHeal Studio — Interactive Homepage Experience Engine
+    // =========================================================================
+
+    let allRuns = [];
+
+    // --- 1. SYSTEM TELEMETRY & RUN HISTORY ---
+    async function loadTelemetry() {
+      const liveDot = document.getElementById('systemLiveDot');
+      const targetBadge = document.getElementById('ovTargetBadge');
+      const targetVal = document.getElementById('ovTargetVal');
+      const targetMeta = document.getElementById('ovTargetMeta');
+      const mongoBadge = document.getElementById('ovMongoBadge');
+      const mongoVal = document.getElementById('ovMongoVal');
+      const mongoMeta = document.getElementById('ovMongoMeta');
+      const headerMongo = document.getElementById('mongoVal');
+      const latestBadge = document.getElementById('ovLatestRunBadge');
+      const latestVal = document.getElementById('ovLatestRunVal');
+      const latestMeta = document.getElementById('ovLatestRunMeta');
+
+      try {
+        // Fetch System & MongoDB Status
+        const statusRes = await fetch('/api/status');
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          if (statusData.db && statusData.db.connected) {
+            mongoBadge.className = 'metric-status-badge badge-pass';
+            mongoBadge.textContent = 'Connected';
+            mongoVal.textContent = `${statusData.db.runs_count} Runs Archived`;
+            mongoMeta.textContent = `localhost:27017 • ${statusData.db.database || 'selfheal_db'}`;
+            if (headerMongo) headerMongo.textContent = `Live (${statusData.db.runs_count} runs)`;
+          } else {
+            mongoBadge.className = 'metric-status-badge badge-bug';
+            mongoBadge.textContent = 'Disconnected';
+            mongoVal.textContent = 'Offline';
+            mongoMeta.textContent = 'MongoDB unreachable on localhost:27017';
+          }
+
+          // Test Reachability of Target Application
+          const targetUrl = statusData.demo_base_url || 'http://127.0.0.1:5000';
+          try {
+            await fetch(`${targetUrl}/health`, { mode: 'no-cors' });
+            targetBadge.className = 'metric-status-badge badge-pass';
+            targetBadge.textContent = 'Online';
+            targetVal.textContent = ':5000 Active';
+            targetMeta.textContent = `${targetUrl}/health`;
+          } catch {
+            targetBadge.className = 'metric-status-badge badge-bug';
+            targetBadge.textContent = 'Unreachable';
+            targetVal.textContent = ':5000 Offline';
+            targetMeta.textContent = 'Target shop server not responding';
+          }
+        }
+      } catch (e) {
+        if (mongoBadge) {
+          mongoBadge.className = 'metric-status-badge badge-neutral';
+          mongoBadge.textContent = 'Status Unavailable';
+        }
       }
-    }).catch(() => {});
+
+      // Fetch Latest Test Runs
+      try {
+        const runsRes = await fetch('/api/runs?limit=20');
+        if (runsRes.ok) {
+          allRuns = await runsRes.json();
+          if (Array.isArray(allRuns) && allRuns.length > 0) {
+            const latest = allRuns[0];
+            const badgeClass = getStatusBadgeClass(latest.status);
+            latestBadge.className = `metric-status-badge ${badgeClass}`;
+            latestBadge.textContent = latest.status || 'UNKNOWN';
+            latestVal.textContent = `Version ${latest.version ? latest.version.toUpperCase() : 'A'} (${latest.duration_ms || 0}ms)`;
+            latestMeta.textContent = `Run ID: ${latest.run_id ? latest.run_id.slice(0, 14) : 'N/A'}...`;
+          } else {
+            latestBadge.className = 'metric-status-badge badge-neutral';
+            latestBadge.textContent = 'Awaiting Run';
+            latestVal.textContent = 'No Runs Yet';
+            latestMeta.textContent = 'Launch a test via Interactive Demo';
+          }
+          // Update current scenario details with run status
+          refreshSelectedScenarioRunStatus();
+          refreshDiagnosisEvidence();
+        }
+      } catch (e) {
+        if (latestBadge) {
+          latestBadge.className = 'metric-status-badge badge-neutral';
+          latestBadge.textContent = 'Unavailable';
+        }
+      }
+    }
+
+    function getStatusBadgeClass(status) {
+      if (!status) return 'badge-neutral';
+      if (status === 'PASS_NO_HEAL') return 'badge-pass';
+      if (status === 'PASS_AFTER_HEAL') return 'badge-heal';
+      if (status.includes('FAIL')) return 'badge-bug';
+      return 'badge-neutral';
+    }
+
+    // --- 2. INTERACTIVE COMPARISON EXPLORER ---
+    const comparisonData = {
+      redesign: {
+        fragileBadge: 'FRAGILE EXECUTION',
+        fragileBadgeClass: 'badge-bug',
+        fragileTitle: 'Single-Page Script Breaks',
+        fragileCode: `// Traditional Playwright/Cypress script
+await page.click('#checkout-btn');
+await page.fill('#card-input', cardNum);
+// Error: Element not found or hidden on Step 1 of wizard!`,
+        fragilePoints: [
+          '<strong>Rigid Linear Path:</strong> Hardcoded to single-page flow; fails immediately when checkout splits into 4 sub-pages.',
+          '<strong>Pipeline Stoppage:</strong> Blocked build requiring manual script rewrites across cart, shipping, payment, and review steps.',
+          '<strong>High Engineering Toil:</strong> Developers spend hours updating locators rather than building business features.'
+        ],
+        selfhealBadge: 'AUTONOMOUS RECONSTRUCTION',
+        selfhealBadgeClass: 'badge-pass',
+        selfhealTitle: 'Intent-Driven Multi-Step Adaptation',
+        selfhealCode: `// SelfHeal Intent Architecture
+AOM UI Drift Detected -> Deep Agent plans 10 validated steps
+Clean replay executes in fresh browser -> Invariants pass
+Recipe v2 automatically saved to MongoDB`,
+        selfhealPoints: [
+          '<strong>Immutable Intent Contract:</strong> Test targets verified goal ("Complete checkout with valid card") without rigid page assumptions.',
+          '<strong>Multi-Step Reconstruction:</strong> Deep Agent navigates wizard pages, fills required fields, and validates accessible names.',
+          '<strong>Deterministic Replay:</strong> Clean replay verifies order confirmation and math invariants from scratch. The AI never declares pass/fail.'
+        ]
+      },
+      locators: {
+        fragileBadge: 'BRITTLE SELECTORS',
+        fragileBadgeClass: 'badge-bug',
+        fragileTitle: 'Renamed IDs & Volatile CSS Classes',
+        fragileCode: `// Brittle CSS/XPath selector query
+await page.locator('button.btn-checkout-v1').click();
+// Error: Timeout 30000ms waiting for selector "button.btn-checkout-v1"`,
+        fragilePoints: [
+          '<strong>Styling Fragility:</strong> CSS class or DOM hierarchy changes cause false alarms even when functionality is intact.',
+          '<strong>Attribute Churn:</strong> Design refreshes trigger cascade of broken locators across the entire regression suite.',
+          '<strong>Opaque Failures:</strong> Generic timeout errors without semantic understanding of what changed in the UI.'
+        ],
+        selfhealBadge: 'SEMANTIC AOM MATCHING',
+        selfhealBadgeClass: 'badge-heal',
+        selfhealTitle: 'Accessible Object Graph Matching',
+        selfhealCode: `// Semantic Target Resolution
+resolve_target(role="button", name="Place Order")
+-> Single visible, enabled element confirmed
+-> Zero AI calls required when accessible contract holds`,
+        selfhealPoints: [
+          '<strong>AOM Accessibility Matching:</strong> Locates controls by exact accessible name and ARIA role, ignoring fragile class names.',
+          '<strong>Ambiguity Guard:</strong> If multiple or disabled elements match, execution safely halts rather than guessing.',
+          '<strong>Zero Hallucination:</strong> Semantic target resolution runs deterministically before invoking any agent.'
+        ]
+      },
+      defects: {
+        fragileBadge: 'CONFUSED TRIAGE',
+        fragileBadgeClass: 'badge-bug',
+        fragileTitle: 'Unclear Defect vs Flake Triage',
+        fragileCode: `// Traditional test runner
+AssertionError: Expected 200 OK, got 500 Internal Server Error
+// Test runner marks test "FLAKY" and blindly retries...`,
+        fragilePoints: [
+          '<strong>Masked Failures:</strong> Flaky test suites cause engineers to ignore real application bugs or blindly retry.',
+          '<strong>Dangerous Auto-Healing:</strong> Naive AI test tools attempt to "heal" around 500 errors by clicking other buttons.',
+          '<strong>Lost Root Cause:</strong> No automatic classification between infrastructure timeouts, UI drift, and server crashes.'
+        ],
+        selfhealBadge: 'DETERMINISTIC DEFECT REFUSAL',
+        selfhealBadgeClass: 'badge-bug',
+        selfhealTitle: 'Rule Engine Rejection (No Masking)',
+        selfhealCode: `// Deterministic Triage Rule Engine
+classify_triage() -> HTTP 500 Alert detected
+-> Verdict: APP_BUG (Strictly refuses to heal)
+-> Halts with FAIL_FUNCTIONAL (Protects software quality)`,
+        selfhealPoints: [
+          '<strong>Rule Engine Triage:</strong> Runs before any LLM is called; classifies HTTP >= 500 or error alerts as APP_BUG.',
+          '<strong>Refusal to Mask Bugs:</strong> The system strictly refuses to heal broken application code.',
+          '<strong>Deterministic Invariant Check:</strong> Verifies math calculations ($32.50 vs $36.50) with pure Python arithmetic.'
+        ]
+      }
+    };
+
+    function initComparisonExplorer() {
+      const tabs = document.querySelectorAll('.comp-tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+
+          const scenarioKey = tab.dataset.scenario;
+          const data = comparisonData[scenarioKey];
+          if (!data) return;
+
+          // Update Left (Fragile)
+          const fBadge = document.getElementById('compFragileBadge');
+          const fTitle = document.getElementById('compFragileTitle');
+          const fCode = document.getElementById('compFragileCode');
+          const fPoints = document.getElementById('compFragilePoints');
+          if (fBadge) {
+            fBadge.textContent = data.fragileBadge;
+            fBadge.className = `badge ${data.fragileBadgeClass}`;
+          }
+          if (fTitle) fTitle.textContent = data.fragileTitle;
+          if (fCode) fCode.textContent = data.fragileCode;
+          if (fPoints) fPoints.innerHTML = data.fragilePoints.map(p => `<li>${p}</li>`).join('');
+
+          // Update Right (SelfHeal)
+          const sBadge = document.getElementById('compSelfhealBadge');
+          const sTitle = document.getElementById('compSelfhealTitle');
+          const sCode = document.getElementById('compSelfhealCode');
+          const sPoints = document.getElementById('compSelfhealPoints');
+          if (sBadge) {
+            sBadge.textContent = data.selfhealBadge;
+            sBadge.className = `badge ${data.selfhealBadgeClass}`;
+          }
+          if (sTitle) sTitle.textContent = data.selfhealTitle;
+          if (sCode) sCode.textContent = data.selfhealCode;
+          if (sPoints) sPoints.innerHTML = data.selfhealPoints.map(p => `<li>${p}</li>`).join('');
+        });
+      });
+    }
+
+    // --- 3. INTERACTIVE SCENARIO EXPLORER ---
+    const scenarioSpecs = {
+      a: {
+        title: 'Scenario Specification: Version A (Passing Baseline)',
+        badge: 'PASS_NO_HEAL',
+        badgeClass: 'badge-pass',
+        tag: 'Single-Page Flow',
+        behavior: 'Standard single-page checkout form with Name, Email, Address, Card, Expiry, and CVC fields. Submits cleanly to confirmation.',
+        verdict: '<strong>PASS_NO_HEAL:</strong> Baseline recipe v1 succeeds. Rule 5 asserts zero LLM calls on passing baseline.',
+        endpoint: 'http://127.0.0.1:5000/v/a/',
+        demoUrl: '/demo?run=a',
+        invariants: [
+          'Order Confirmation header visible in DOM',
+          'Order ID format matches ORD-[0-9]{5}',
+          'Deterministic Total == $36.50 (Items $30.00 + Shipping $5.00 + Tax $1.50)',
+          'Zero HTTP 5xx or unhandled alert dialogs',
+          'Zero LLM calls required (Clean v1 recipe match)'
+        ]
+      },
+      b: {
+        title: 'Scenario Specification: Version B (UI Redesign & Auto-Heal)',
+        badge: 'PASS_AFTER_HEAL',
+        badgeClass: 'badge-heal',
+        tag: '4-Step Wizard',
+        behavior: 'Checkout form redesigned into a 4-step wizard (Cart, Shipping, Payment, Review). SelfHeal detects UI drift and reconstructs the 10-step path.',
+        verdict: '<strong>PASS_AFTER_HEAL:</strong> Reconstructs steps, passes clean replay in isolated browser, saves Recipe v2.',
+        endpoint: 'http://127.0.0.1:5000/v/b/',
+        demoUrl: '/demo?run=b',
+        invariants: [
+          'All 4 wizard steps traversed (Cart \u2192 Shipping \u2192 Payment \u2192 Review)',
+          '10 field_keys mapped to accessible names via AOM tree',
+          'Order Total == $36.50 invariant satisfied on Review step',
+          'Clean replay passes in isolated browser context',
+          'New Recipe v2 generated & saved to MongoDB'
+        ]
+      },
+      c: {
+        title: 'Scenario Specification: Version C (Server Defect Defense)',
+        badge: 'FAIL_FUNCTIONAL',
+        badgeClass: 'badge-bug',
+        tag: 'HTTP 500 Bug',
+        behavior: 'Single-page checkout form triggers a genuine HTTP 500 internal server error alert upon submission.',
+        verdict: '<strong>FAIL_FUNCTIONAL:</strong> Rule engine classifies APP_BUG before LLM call and deterministically refuses to heal.',
+        endpoint: 'http://127.0.0.1:5000/v/c/',
+        demoUrl: '/demo?run=c',
+        invariants: [
+          'HTTP >= 500 error alert triggered on submission',
+          'Triage Rule 1 classifies defect as APP_BUG',
+          'Deep Agent invocation strictly refused (0 LLM calls)',
+          'Deterministic status: FAIL_FUNCTIONAL (Defect not masked)',
+          'Recipe remains unchanged at v1'
+        ]
+      },
+      d: {
+        title: 'Scenario Specification: Version D (Invariant Math Defect)',
+        badge: 'FAIL_FUNCTIONAL',
+        badgeClass: 'badge-bug',
+        tag: 'Calculation Bug',
+        behavior: 'Multi-step flow completes, but order summary displays incorrect total of $32.50 instead of $36.50.',
+        verdict: '<strong>FAIL_FUNCTIONAL:</strong> Deterministic verifier invariant asserts total == 36.50 and flags calculation error.',
+        endpoint: 'http://127.0.0.1:5000/v/d/',
+        demoUrl: '/demo?run=d',
+        invariants: [
+          'Multi-step checkout path successfully navigated',
+          'Confirmation order total displays $32.50',
+          'Deterministic math invariant check: $32.50 != $36.50 expected',
+          'Triage Rule 3 catches invariant mismatch \u2192 APP_BUG',
+          'Deterministic status: FAIL_FUNCTIONAL (Defect exposed)'
+        ]
+      }
+    };
+
+    let selectedVersion = 'a';
+
+    function selectScenario(version) {
+      selectedVersion = version;
+      const cards = document.querySelectorAll('.scenario-interactive-card');
+      cards.forEach(card => {
+        const isMatch = card.dataset.version === version;
+        card.classList.toggle('selected', isMatch);
+        card.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+      });
+
+      const spec = scenarioSpecs[version];
+      if (!spec) return;
+
+      const pTitle = document.getElementById('detailPanelTitle');
+      const pBadge = document.getElementById('detailPanelBadge');
+      const pTag = document.getElementById('detailPanelTag');
+      const pBehavior = document.getElementById('detailTargetBehavior');
+      const pVerdict = document.getElementById('detailExpectedVerdict');
+      const pEndpoint = document.getElementById('detailTargetEndpoint');
+      const pInvariants = document.getElementById('detailInvariants');
+      const btnInspect = document.getElementById('btnDetailInspect');
+      const btnRun = document.getElementById('btnDetailRun');
+
+      if (pTitle) pTitle.textContent = spec.title;
+      if (pBadge) {
+        pBadge.textContent = spec.badge;
+        pBadge.className = `badge ${spec.badgeClass}`;
+      }
+      if (pTag) pTag.textContent = spec.tag;
+      if (pBehavior) pBehavior.textContent = spec.behavior;
+      if (pVerdict) pVerdict.innerHTML = spec.verdict;
+      if (pEndpoint) pEndpoint.innerHTML = `<code class="code-inline">${spec.endpoint}</code>`;
+      if (pInvariants && spec.invariants) {
+        pInvariants.innerHTML = `
+          <ul style="margin: 0; padding-left: 18px; font-size: 13px; color: var(--mono-graphite); line-height: 1.6;">
+            ${spec.invariants.map(inv => `<li>${inv}</li>`).join('')}
+          </ul>
+        `;
+      }
+      if (btnInspect) btnInspect.href = spec.endpoint;
+      if (btnRun) {
+        btnRun.href = spec.demoUrl;
+        btnRun.textContent = `Launch Version ${version.toUpperCase()} in Demo \u2192`;
+      }
+
+      refreshSelectedScenarioRunStatus();
+    }
+
+    function refreshSelectedScenarioRunStatus() {
+      const statusBox = document.getElementById('detailMongoStatus');
+      if (!statusBox) return;
+
+      if (!allRuns || allRuns.length === 0) {
+        statusBox.innerHTML = '<span class="text-muted">No runs recorded in local MongoDB yet. Launch a run via Demo to inspect live telemetry.</span>';
+        return;
+      }
+
+      const match = allRuns.find(r => r.version && r.version.toLowerCase() === selectedVersion);
+      if (match) {
+        const badgeClass = getStatusBadgeClass(match.status);
+        statusBox.innerHTML = `
+          <div><span class="badge ${badgeClass}" style="margin-right: 6px;">${match.status}</span> <strong>${match.duration_ms || 0}ms</strong></div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Run ID: <code>${match.run_id ? match.run_id.slice(0, 14) : 'N/A'}...</code></div>
+        `;
+      } else {
+        statusBox.innerHTML = '<span class="text-muted">No recorded run for this version yet in MongoDB.</span>';
+      }
+    }
+
+    function initScenarioExplorer() {
+      // Scenario Card Selection
+      const cards = document.querySelectorAll('.scenario-interactive-card');
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          selectScenario(card.dataset.version);
+        });
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectScenario(card.dataset.version);
+          }
+        });
+      });
+
+      // Filter Pills
+      const filterPills = document.querySelectorAll('.scenario-filter-bar .filter-pill');
+      const countLabel = document.getElementById('scenarioFilterCount');
+      filterPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          filterPills.forEach(p => {
+            p.classList.remove('active');
+            p.setAttribute('aria-checked', 'false');
+          });
+          pill.classList.add('active');
+          pill.setAttribute('aria-checked', 'true');
+
+          const filter = pill.dataset.filter;
+          let visibleCount = 0;
+          cards.forEach(card => {
+            const cat = card.dataset.category;
+            const isVisible = (filter === 'all' || cat === filter);
+            card.style.display = isVisible ? 'flex' : 'none';
+            if (isVisible) visibleCount++;
+          });
+          if (countLabel) {
+            countLabel.textContent = `Showing ${visibleCount} of 4 verification suites`;
+          }
+        });
+      });
+    }
+
+    // --- FEATURE 2: UI DRIFT VISUALIZER ---
+    const wizardStepsData = {
+      1: {
+        path: 'Viewport: /v/b/ (Cart Overview)',
+        total: 'Verified Total: $36.50',
+        fields: [
+          { name: 'Cart Item: SelfHeal Test Package', tag: '$30.00' },
+          { name: 'Standard Shipping Rate', tag: '$5.00' },
+          { name: 'Estimated Tax (5%)', tag: '$1.50' },
+          { name: 'Action: Proceed to Shipping', tag: 'button: "Continue to Shipping"', highlight: true }
+        ]
+      },
+      2: {
+        path: 'Viewport: /v/b/shipping (Shipping Details)',
+        total: 'Verified Total: $36.50',
+        fields: [
+          { name: 'Recipient Full Name', tag: 'input#name ("Jane Doe")' },
+          { name: 'Email for Order Receipt', tag: 'input#email ("jane@example.com")' },
+          { name: 'Street Address & Suite', tag: 'input#address ("123 Test Ave")' },
+          { name: 'Action: Proceed to Payment', tag: 'button: "Continue to Payment"', highlight: true }
+        ]
+      },
+      3: {
+        path: 'Viewport: /v/b/payment (Payment Details)',
+        total: 'Verified Total: $36.50',
+        fields: [
+          { name: 'Card Number (Masked Test Card)', tag: 'input#card ("•••• 4242")' },
+          { name: 'Expiration Date (MM/YY)', tag: 'input#exp ("12/28")' },
+          { name: 'Card Security Code (CVC)', tag: 'input#cvc ("123")' },
+          { name: 'Action: Proceed to Review', tag: 'button: "Continue to Review"', highlight: true }
+        ]
+      },
+      4: {
+        path: 'Viewport: /v/b/review (Final Order Review)',
+        total: 'Verified Total: $36.50 (Invariant Match)',
+        fields: [
+          { name: 'Order Summary Verified', tag: '$36.50 Match' },
+          { name: 'Shipping Address Confirmed', tag: 'AOM Verified' },
+          { name: 'Payment Method Confirmed', tag: 'AOM Verified' },
+          { name: 'Final Action: Submit Order', tag: 'button: "Place Order"', highlight: true }
+        ]
+      }
+    };
+
+    function renderWizardStep(stepNum) {
+      const data = wizardStepsData[stepNum] || wizardStepsData[1];
+      const pathEl = document.getElementById('wizardStepPath');
+      const totalEl = document.getElementById('wizardStepTotal');
+      const fieldsEl = document.getElementById('wizardStepFields');
+
+      if (pathEl) pathEl.textContent = data.path;
+      if (totalEl) totalEl.textContent = data.total;
+      if (fieldsEl) {
+        fieldsEl.innerHTML = data.fields.map(f => `
+          <div class="mockup-field-row"${f.highlight ? ' style="background: var(--mono-offwhite); font-weight: 600;"' : ''}>
+            <span>${f.name}</span>
+            <span class="mockup-field-tag">${f.tag}</span>
+          </div>
+        `).join('');
+      }
+
+      // Update step pill active state
+      const stepPills = document.querySelectorAll('#stepNavigator .drift-pill');
+      stepPills.forEach(pill => {
+        const isMatch = parseInt(pill.dataset.step, 10) === stepNum;
+        pill.classList.toggle('active', isMatch);
+        pill.setAttribute('aria-checked', isMatch ? 'true' : 'false');
+      });
+
+      // Update mockup header step badge active state
+      const stepBadges = document.querySelectorAll('#mockupStepBadges .mockup-step-badge');
+      stepBadges.forEach(b => {
+        const isMatch = parseInt(b.dataset.stepBadge, 10) === stepNum;
+        b.classList.toggle('active', isMatch);
+      });
+    }
+
+    function initDriftVisualizer() {
+      // Step switching
+      const stepPills = document.querySelectorAll('#stepNavigator .drift-pill');
+      stepPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          const stepNum = parseInt(pill.dataset.step, 10);
+          renderWizardStep(stepNum);
+        });
+      });
+
+      // Mockup step badges clickable
+      const stepBadges = document.querySelectorAll('#mockupStepBadges .mockup-step-badge');
+      stepBadges.forEach(badge => {
+        badge.style.cursor = 'pointer';
+        badge.addEventListener('click', () => {
+          const stepNum = parseInt(badge.dataset.stepBadge, 10);
+          renderWizardStep(stepNum);
+        });
+      });
+
+      // View Layout switching (Side-by-side vs Version A vs Version B)
+      const viewButtons = [
+        document.getElementById('btnViewSideBySide'),
+        document.getElementById('btnViewVersionA'),
+        document.getElementById('btnViewVersionB')
+      ];
+      const grid = document.getElementById('driftComparisonGrid');
+      const cardA = document.getElementById('driftOriginalCard');
+      const cardB = document.getElementById('driftRedesignedCard');
+
+      viewButtons.forEach(btn => {
+        if (!btn) return;
+        btn.addEventListener('click', () => {
+          viewButtons.forEach(b => {
+            if (b) {
+              b.classList.remove('active');
+              b.setAttribute('aria-checked', 'false');
+            }
+          });
+          btn.classList.add('active');
+          btn.setAttribute('aria-checked', 'true');
+
+          const view = btn.dataset.view;
+          if (view === 'side-by-side') {
+            if (grid) grid.style.gridTemplateColumns = '';
+            if (cardA) cardA.style.display = 'flex';
+            if (cardB) cardB.style.display = 'flex';
+          } else if (view === 'version-a') {
+            if (grid) grid.style.gridTemplateColumns = '1fr';
+            if (cardA) cardA.style.display = 'flex';
+            if (cardB) cardB.style.display = 'none';
+          } else if (view === 'version-b') {
+            if (grid) grid.style.gridTemplateColumns = '1fr';
+            if (cardA) cardA.style.display = 'none';
+            if (cardB) cardB.style.display = 'flex';
+          }
+        });
+      });
+
+      renderWizardStep(1);
+    }
+
+    // --- FEATURE 3: FAILURE DIAGNOSIS CENTER ---
+    const diagnosisSpecs = {
+      PASS_NO_HEAL: {
+        badge: 'PASS_NO_HEAL',
+        badgeClass: 'badge-pass',
+        title: 'Diagnosis: PASS_NO_HEAL (Baseline Passing)',
+        category: 'Outcome: Passing Baseline',
+        rule: '<strong>engine/classifier.py Rule 5:</strong> Recipe v1 executes cleanly in browser. Deterministic verifier invariants pass. Rule 5 guarantees zero LLM calls on passing baselines.',
+        safety: '<strong>Status Computed by Code:</strong> AI is never invoked. Recipe stays version 1. Zero cost, zero latency penalty, and zero risk of LLM hallucination.',
+        types: '<code>NONE (All 6 baseline steps resolved and executed cleanly)</code>'
+      },
+      PASS_AFTER_HEAL: {
+        badge: 'PASS_AFTER_HEAL',
+        badgeClass: 'badge-heal',
+        title: 'Diagnosis: PASS_AFTER_HEAL (UI Drift Self-Healed)',
+        category: 'Outcome: UI Drift Healed',
+        rule: '<strong>engine/classifier.py Rule 2:</strong> AOM tree diff identifies missing or moved elements with zero HTTP errors. Deep Agent reconstructs workflow from immutable intent.',
+        safety: '<strong>Clean Replay Verification:</strong> The AI proposes steps, but code deterministically validates every action. Re-executed from scratch in an isolated browser context before saving Recipe v2.',
+        types: '<code>ELEMENT_NOT_FOUND, TARGET_MOVED, WORKFLOW_SPLIT (e.g. 1-page to 4-step wizard)</code>'
+      },
+      FAIL_FUNCTIONAL: {
+        badge: 'FAIL_FUNCTIONAL',
+        badgeClass: 'badge-bug',
+        title: 'Diagnosis: FAIL_FUNCTIONAL (Application Defect Rejected)',
+        category: 'Outcome: Genuine Application Bug',
+        rule: '<strong>engine/classifier.py Rules 1 & 3:</strong> Rule 1 catches HTTP >= 500 or error alert dialogs. Rule 3 catches mathematical calculation invariant mismatches ($32.50 vs $36.50).',
+        safety: '<strong>Strict Refusal to Heal:</strong> AI healing is <em>strictly refused</em>. Deep Agent is never invoked. An application bug is preserved as an explicit test failure to protect production code.',
+        types: '<code>HTTP_500_SERVER_ERROR, ERROR_ALERT_DIALOG, INVARIANT_MATH_MISMATCH, CONFIRMATION_MISSING</code>'
+      },
+      FAIL_HEALING: {
+        badge: 'FAIL_HEALING',
+        badgeClass: 'badge-bug',
+        title: 'Diagnosis: FAIL_HEALING (Reconstruction Unresolved)',
+        category: 'Outcome: Healing Exhausted',
+        rule: '<strong>engine/agent/healer.py Limits:</strong> Deep Agent executed 10 allowable actions or hit the MAX_HEAL_SECONDS recursion limit without discovering a valid path to intent satisfaction.',
+        safety: '<strong>Bounded Execution Guard:</strong> Hard limits prevent runaway agent loops, endless retries, or excessive token consumption. Preserves deterministic exit.',
+        types: '<code>EXHAUSTED_ACTION_BUDGET, RECURSION_LIMIT_EXCEEDED, NO_HEALABLE_PATH</code>'
+      },
+      FAIL_EXECUTION: {
+        badge: 'FAIL_EXECUTION',
+        badgeClass: 'badge-neutral',
+        title: 'Diagnosis: FAIL_EXECUTION (Infrastructure / Flaky Failure)',
+        category: 'Outcome: Execution / Timeout Issue',
+        rule: '<strong>engine/classifier.py Rule 4:</strong> Network timeout, browser context crash, or infrastructure stall that failed again after one clean retry.',
+        safety: '<strong>Single Retry Verification:</strong> Flaky network delays trigger exactly one clean context retry. If failure persists, it is flagged as FAIL_EXECUTION rather than blamed on application code or AI.',
+        types: '<code>PLAYWRIGHT_TIMEOUT, TARGET_CLOSED, BROWSER_CRASH, NETWORK_DISCONNECT</code>'
+      },
+      NEEDS_REVIEW: {
+        badge: 'NEEDS_REVIEW',
+        badgeClass: 'badge-neutral',
+        title: 'Diagnosis: NEEDS_REVIEW (Ambiguity / Low Confidence)',
+        category: 'Outcome: Human Review Required',
+        rule: '<strong>engine/classifier.py Rule 5:</strong> Target resolution detected multiple accessible matches (e.g. duplicate buttons) or agent proposed low-confidence steps.',
+        safety: '<strong>Deterministic Ambiguity Guard:</strong> The system refuses to guess when UI controls are ambiguous. Halts and requires human review before any recipe change can be saved.',
+        types: '<code>AMBIGUOUS_ACCESSIBLE_NAME, MULTIPLE_MATCHING_ELEMENTS, LOW_CONFIDENCE_PROPOSAL</code>'
+      },
+      BLOCKED_CONFIG: {
+        badge: 'BLOCKED_CONFIG',
+        badgeClass: 'badge-neutral',
+        title: 'Diagnosis: BLOCKED_CONFIG (Missing Configuration)',
+        category: 'Outcome: Configuration Blocked',
+        rule: '<strong>AGENTS.md Rule 12:</strong> Missing API key (GEMINI_API_KEY), invalid model setting, or unregistered target origin outside allowlist.',
+        safety: '<strong>Never Fake AI:</strong> SelfHeal never fabricates or mocks AI responses when configuration is absent. It fails fast with BLOCKED_CONFIG.',
+        types: '<code>MISSING_GEMINI_KEY, ORIGIN_ALLOWLIST_REJECTED, INVALID_ENV_VARS</code>'
+      },
+      BLOCKED_AGENT: {
+        badge: 'BLOCKED_AGENT',
+        badgeClass: 'badge-neutral',
+        title: 'Diagnosis: BLOCKED_AGENT (Model / API Transport Error)',
+        category: 'Outcome: Agent API Failure',
+        rule: '<strong>AGENTS.md Rule 12:</strong> Upstream LLM provider returned HTTP 429 (rate limit), quota exhaustion, or unrecoverable network error during agent invocation.',
+        safety: '<strong>Zero Synthetic Faking:</strong> When an AI provider fails, the test run is safely marked BLOCKED_AGENT. The system never falls back to fake heuristic passes.',
+        types: '<code>RATE_LIMIT_429, QUOTA_EXCEEDED, UPSTREAM_API_TIMEOUT, MODEL_ERROR</code>'
+      },
+      FAIL_BASELINE: {
+        badge: 'FAIL_BASELINE',
+        badgeClass: 'badge-bug',
+        title: 'Diagnosis: FAIL_BASELINE (Untrusted Baseline)',
+        category: 'Outcome: Baseline Contract Broken',
+        rule: '<strong>AGENTS.md Status Rule:</strong> Version A (the baseline implementation) failed on initial run, so no baseline inventory or recipe can be trusted.',
+        safety: '<strong>Integrity Prerequisite:</strong> Healing cannot be trusted unless the baseline was formally verified against the immutable intent.',
+        types: '<code>BASELINE_INITIAL_FAILURE, INVALID_BASELINE_INVENTORY, HASH_MISMATCH</code>'
+      }
+    };
+
+    let selectedDiagCode = 'PASS_NO_HEAL';
+
+    function selectDiagnosis(code) {
+      selectedDiagCode = code;
+      const cards = document.querySelectorAll('.diagnosis-card');
+      cards.forEach(card => {
+        const isMatch = card.dataset.code === code;
+        card.classList.toggle('selected', isMatch);
+        card.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+      });
+
+      const spec = diagnosisSpecs[code];
+      if (!spec) return;
+
+      const badge = document.getElementById('diagDetailBadge');
+      const title = document.getElementById('diagDetailTitle');
+      const cat = document.getElementById('diagDetailCategory');
+      const rule = document.getElementById('diagDetailRule');
+      const safety = document.getElementById('diagDetailSafety');
+      const types = document.getElementById('diagDetailTypes');
+
+      if (badge) {
+        badge.textContent = spec.badge;
+        badge.className = `badge ${spec.badgeClass}`;
+      }
+      if (title) title.textContent = spec.title;
+      if (cat) cat.textContent = spec.category;
+      if (rule) rule.innerHTML = spec.rule;
+      if (safety) safety.innerHTML = spec.safety;
+      if (types) types.innerHTML = spec.types;
+
+      refreshDiagnosisEvidence();
+    }
+
+    function refreshDiagnosisEvidence() {
+      const evidenceEl = document.getElementById('diagDetailEvidence');
+      if (!evidenceEl) return;
+
+      if (!allRuns || allRuns.length === 0) {
+        evidenceEl.innerHTML = '<span class="text-muted">No runs recorded in local MongoDB yet. Launch a run via Demo to inspect live telemetry.</span>';
+        return;
+      }
+
+      const matchingRuns = allRuns.filter(r => r.status === selectedDiagCode);
+      if (matchingRuns.length > 0) {
+        const r = matchingRuns[0];
+        evidenceEl.innerHTML = `
+          <div><span class="badge ${getStatusBadgeClass(r.status)}" style="margin-right: 6px;">${r.status}</span> <strong>${r.version ? 'Version ' + r.version.toUpperCase() : 'Test Run'}</strong> (${r.duration_ms || 0}ms)</div>
+          <div style="font-size: 11px; color: var(--mono-graphite); margin-top: 4px;">Run ID: <code>${r.run_id ? r.run_id.slice(0, 16) : 'N/A'}...</code> &bull; Timestamp: ${r.timestamp ? new Date(r.timestamp).toLocaleTimeString() : 'Recent'}</div>
+          ${r.error_message ? `<div style="font-size: 11px; color: var(--mono-black); margin-top: 4px; font-family: monospace;">Detail: ${r.error_message}</div>` : ''}
+        `;
+      } else {
+        evidenceEl.innerHTML = `<span class="text-muted">No recorded run with verdict <code>${selectedDiagCode}</code> in recent MongoDB runs (${allRuns.length} runs examined).</span>`;
+      }
+    }
+
+    function initDiagnosisCenter() {
+      // Card selection
+      const cards = document.querySelectorAll('.diagnosis-card');
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          selectDiagnosis(card.dataset.code);
+        });
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectDiagnosis(card.dataset.code);
+          }
+        });
+      });
+
+      // Category filter pills
+      const filterPills = document.querySelectorAll('.diagnosis-filters-bar .filter-pill');
+      const countLabel = document.getElementById('diagFilterCount');
+
+      filterPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          filterPills.forEach(p => {
+            p.classList.remove('active');
+            p.setAttribute('aria-checked', 'false');
+          });
+          pill.classList.add('active');
+          pill.setAttribute('aria-checked', 'true');
+
+          const filter = pill.dataset.diagFilter;
+          let visibleCount = 0;
+          cards.forEach(card => {
+            const cat = card.dataset.diagCat;
+            const isVisible = (filter === 'all' || cat === filter);
+            card.style.display = isVisible ? 'flex' : 'none';
+            if (isVisible) visibleCount++;
+          });
+          if (countLabel) {
+            countLabel.textContent = `Showing ${visibleCount} of 9 system verdicts`;
+          }
+        });
+      });
+
+      selectDiagnosis('PASS_NO_HEAL');
+    }
+
+    // --- 4. INTERACTIVE GUARDRAILS EXPLORER ---
+    function initGuardrailsExplorer() {
+      const cards = document.querySelectorAll('.guardrail-card');
+      const catPills = document.querySelectorAll('.guardrail-cat-pill');
+      const searchInput = document.getElementById('guardrailSearch');
+
+      // Expand/Collapse Toggles
+      cards.forEach(card => {
+        const btn = card.querySelector('.guardrail-expand-btn');
+        const drawer = card.querySelector('.guardrail-drawer');
+        if (btn && drawer) {
+          btn.addEventListener('click', () => {
+            const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', !isExpanded);
+            drawer.hidden = isExpanded;
+            card.classList.toggle('expanded', !isExpanded);
+            btn.querySelector('span').textContent = isExpanded ? 'View Technical Safeguards' : 'Hide Technical Safeguards';
+          });
+        }
+      });
+
+      // Category Filter
+      let currentCat = 'all';
+      catPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          catPills.forEach(p => {
+            p.classList.remove('active');
+            p.setAttribute('aria-checked', 'false');
+          });
+          pill.classList.add('active');
+          pill.setAttribute('aria-checked', 'true');
+          currentCat = pill.dataset.cat;
+          filterGuardrails();
+        });
+      });
+
+      // Instant Search
+      if (searchInput) {
+        searchInput.addEventListener('input', () => {
+          filterGuardrails();
+        });
+      }
+
+      function filterGuardrails() {
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        cards.forEach(card => {
+          const cardCat = card.dataset.cat;
+          const keywords = (card.dataset.keywords || '') + ' ' + card.innerText.toLowerCase();
+          const matchesCat = (currentCat === 'all' || cardCat === currentCat);
+          const matchesQuery = !query || keywords.includes(query);
+
+          card.style.display = (matchesCat && matchesQuery) ? 'flex' : 'none';
+        });
+      }
+    }
+
+    // --- INITIALIZE ON DOM READY ---
+    document.addEventListener('DOMContentLoaded', () => {
+      loadTelemetry();
+      initComparisonExplorer();
+      initScenarioExplorer();
+      initDriftVisualizer();
+      initDiagnosisCenter();
+      initGuardrailsExplorer();
+      selectScenario('a');
+
+      const btnRefresh = document.getElementById('btnRefreshTelemetry');
+      if (btnRefresh) {
+        btnRefresh.addEventListener('click', () => {
+          btnRefresh.querySelector('span').textContent = 'Refreshing...';
+          loadTelemetry().finally(() => {
+            setTimeout(() => {
+              btnRefresh.querySelector('span').textContent = 'Live Refresh';
+            }, 600);
+          });
+        });
+      }
+    });
   </script>
 </body>
 </html>
